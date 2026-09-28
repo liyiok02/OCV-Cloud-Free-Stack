@@ -1,5 +1,30 @@
 # OCV 全云端免费栈插件
 
+> 🏠 **宿主项目：[One-Click VidGen（OCV / 一键成片）](https://github.com/IFRIT-Zhou/One-Click-VidGen)**
+>
+> OCV 是一个开源（AGPL-3.0-only）的 AI 视频生产工作台：FastAPI 后端 + Vue 前端，
+> 覆盖「文案 → 配音 → 字幕识别校对 → 语义分镜 → 生图 → 精修 → 时序 → BGM →
+> 视频合成」的完整流水线，原生支持本地 GPU（IndexTTS-2.5）与多种云端接口。
+>
+> 本插件是 OCV 的扩展插件：在**没有 NVIDIA 显卡**的机器上，把配音（MiMo TTS）、
+> 语言模型与分镜生图（商汤 SenseNova）三层替换为云端免费接口，让 OCV 全流程
+> 照常跑通，且**不修改一行 OCV 源码**。使用前请先获取并安装
+> [OCV 本体](https://github.com/IFRIT-Zhou/One-Click-VidGen)，再把本插件装入其
+> `plugins/` 目录。
+>
+> 本插件为独立扩展项目，非 OCV 官方发布；OCV 品牌使用边界见
+> [TRADEMARKS.md](./TRADEMARKS.md)。
+
+> **English summary** — OCV Cloud Free Stack is a community plugin for
+> [One-Click VidGen (OCV)](https://github.com/IFRIT-Zhou/One-Click-VidGen), an
+> open-source (AGPL-3.0-only) AI video production workbench. It swaps the TTS,
+> LLM, and storyboard-image layers to free cloud APIs (MiMo TTS, SenseNova), so
+> the whole text-to-video pipeline runs on machines **without an NVIDIA GPU**.
+> It hooks the OCV runtime at interpreter startup and **modifies zero lines of
+> OCV source code**; deleting the plugin directory uninstalls it completely.
+> This is an independent extension, not an official OCV release. Licensed
+> AGPL-3.0-only. Install OCV first, then drop this plugin into `plugins/`.
+
 > ## ⛔ 改这个插件之前必读（两条最高铁律）
 >
 > **A. 禁止直接改动 OCV 源码。** 只能修改 `plugins/cloud_free_stack/` 下的文件。
@@ -182,7 +207,27 @@ runtime/python/Lib/site-packages/ocv_cloud_free_stack.pth   ← 注入锚点
 
 ## 安装
 
-### 1. 写入配置
+### 0. 先装 OCV 本体
+
+本插件是 OCV 的扩展，**不能独立运行**。请先获取并安装宿主项目
+[One-Click VidGen（OCV / 一键成片）](https://github.com/IFRIT-Zhou/One-Click-VidGen)：
+
+```bat
+git clone https://github.com/IFRIT-Zhou/One-Click-VidGen.git
+```
+
+按该项目 README 完成源码部署或安装 Windows 整合包，然后进入下一步。
+
+### 1. 放入插件目录
+
+把本仓库（或 Release 里的 `OCV-Cloud-Free-Stack-v*.zip`，解压后是
+`cloud_free_stack/`）放进 OCV 根目录的 `plugins/` 下，最终路径为：
+
+```text
+<OCV 根目录>\plugins\cloud_free_stack\
+```
+
+### 2. 写入配置
 
 ```bat
 cd /d E:\1B1BLaoYang
@@ -201,7 +246,7 @@ runtime\python\python.exe plugins\cloud_free_stack\cloud_stack_ctl.py install
 * 往 `frontend/index.html` 注入一行 `<script src="…/panel.js" defer>`
   （前后带 `<!-- cloud_free_stack BEGIN/END -->` 标记，可逆）
 
-### 2. 填入 API Key
+### 3. 填入 API Key
 
 **推荐**：启动 OCV，点界面右下角「云端免费栈」按钮，在面板里填
 MiMo Key 与商汤 Key，点「保存并立即生效」。
@@ -216,7 +261,7 @@ SENSENOVA_API_KEY=<商汤的 Key>
 > 一个坑：`MIMO_API_KEY` 为空时模块 1 会直接报
 > `未配置 MIMO API Key`。这句话是插件抛的，来源就是面板/`.env` 里这两个键。
 
-### 3. 自检
+### 4. 自检
 
 ```bat
 runtime\python\python.exe plugins\cloud_free_stack\cloud_stack_ctl.py check
@@ -226,7 +271,7 @@ runtime\python\python.exe plugins\cloud_free_stack\cloud_stack_ctl.py check
 MiMo TTS → 商汤图片（经本地 shim 真实出一张图）。
 如果只想跳过耗额度的出图测试，加 `--skip-image`。
 
-### 4. 启动
+### 5. 启动
 
 **用你平时的入口启动就行**（`双击启动.bat` / `OCV_Launcher.exe`），插件会自动挂载。
 
@@ -1072,8 +1117,9 @@ plugins/cloud_free_stack/
 ## 许可证与免责声明
 
 本插件自研代码依据 [GNU Affero General Public License Version 3
-only](./LICENSE)（`AGPL-3.0-only`）发布，与宿主项目 One-Click VidGen 保持
-一致；版权与署名见 [NOTICE](./NOTICE)，附加条款见
+only](./LICENSE)（`AGPL-3.0-only`）发布，与宿主项目
+[One-Click VidGen（OCV / 一键成片）](https://github.com/IFRIT-Zhou/One-Click-VidGen)
+保持一致；版权与署名见 [NOTICE](./NOTICE)，附加条款见
 [ADDITIONAL_TERMS.md](./ADDITIONAL_TERMS.md)。本插件只在本地把 OCV 接到
 第三方云接口，不修改、不再分发 OCV 源码；OCV 本体版权、官方仓库与品牌
 使用边界见 NOTICE 和 [TRADEMARKS.md](./TRADEMARKS.md)。第三方组件与在线
