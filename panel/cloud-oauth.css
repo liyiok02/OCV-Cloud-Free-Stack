@@ -1,0 +1,158 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+/* ===========================================================================
+   云端 OAuth 分页的样式。
+   视觉语言借鉴原 Jet Hub 面板（jet-hub-styles.js），但做了三处**必要适配**：
+
+   1. **预计算颜色，不用 `color-mix()`** —— 原实现有 15 处 color-mix，
+      需 Chrome 111+，而原 bundle 的 target 是 chrome100。这里把混合结果
+      算好写死，观感一致且无版本门槛。
+   2. **走本面板自己的 CSS 变量**（`--bg/--panel/--text/--muted/--border`），
+      于是自动跟随本面板的深浅色 —— 原 Jet Hub 是不支持深色模式的。
+   3. 类名前缀 `jh-`，与面板既有的 `.card/.mini/.kv` 风格并存不冲突。
+
+   由 `dev_patch_panel_html.py` 注入到面板的样式块末尾之前。
+
+   ⚠ **本文件里绝不能出现 style 或 script 元素的尖括号标签文本**
+   （哪怕是写在注释里、哪怕是作为说明）。原因：style 元素在 HTML 里是
+   **raw text 元素**，解析器在其内部**不做标签解析、也不认 CSS 注释**，
+   一旦遇到结束标签就立刻关闭样式块，把后面所有 CSS 当成**页面可见文本**
+   渲染出来 —— 用户看到的就是「面板出现一大段乱码样式」。
+   本次开发真的踩了这个坑，而且是**连续两次**：第二次是修第一次时
+   把标签文本写进了说明注释里（见 docs/JETHUB.md F-004）。
+   同理，`cloud-oauth.js` 里也不能出现 script 元素的结束标签文本。
+   =========================================================================== */
+
+.jh-layout { display: flex; gap: 12px; align-items: flex-start; }
+.jh-rail {
+  width: 172px; flex: 0 0 172px; display: flex; flex-direction: column; gap: 2px;
+  max-height: 460px; overflow-y: auto; padding-right: 4px;
+}
+.jh-rail button {
+  display: flex; align-items: center; gap: 7px; width: 100%; text-align: left;
+  padding: 7px 10px; border: 1px solid transparent; border-radius: 9px;
+  background: transparent; color: var(--text); font-size: 12.5px; cursor: pointer;
+  transition: background .16s ease, border-color .16s ease;
+}
+.jh-rail button:hover { background: rgba(22,119,255,.07); }
+.jh-rail button[aria-selected="true"] {
+  background: rgba(22,119,255,.11); border-color: rgba(22,119,255,.28);
+  color: #1677ff; font-weight: 600;
+}
+.jh-dot { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 7px;
+  background: var(--muted); opacity: .45; }
+.jh-rail button[aria-selected="true"] .jh-dot { background: #1677ff; opacity: 1; }
+.jh-main { flex: 1; min-width: 0; }
+
+/* 账号卡：键值网格对齐 —— 原版「看起来整齐」的关键，纯 DOM 极易复刻 */
+.jh-card {
+  border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px;
+  margin-bottom: 10px; background: var(--panel);
+  box-shadow: 0 2px 8px rgba(31,35,41,.03);
+  transition: box-shadow .18s ease, opacity .18s ease;
+}
+.jh-card:hover { box-shadow: 0 5px 16px rgba(31,35,41,.06); }
+.jh-card[data-enabled="false"] { opacity: .62; }
+.jh-cardTop { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.jh-status { width: 8px; height: 8px; border-radius: 50%; background: #9aa0a6; flex: 0 0 8px; }
+.jh-card[data-enabled="true"] .jh-status {
+  background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.14);
+}
+.jh-name { font-weight: 600; font-size: 13px; }
+.jh-tag { font-size: 11px; padding: 1px 7px; border-radius: 999px; border: 1px solid transparent; }
+.jh-tag[data-tone="on"] { color: #15803d; background: rgba(34,197,94,.10); border-color: rgba(34,197,94,.22); }
+.jh-tag[data-tone="off"] { color: var(--muted); background: rgba(154,160,166,.12); border-color: rgba(154,160,166,.22); }
+.jh-tag[data-tone="warn"] { color: #b45309; background: rgba(227,116,0,.10); border-color: rgba(227,116,0,.22); }
+
+.jh-meta {
+  display: grid; grid-template-columns: 56px minmax(0,1fr);
+  gap: 3px 8px; align-items: baseline; margin: 0 0 8px; font-size: 12px;
+}
+.jh-meta dt { color: var(--muted); }
+.jh-meta dd { margin: 0; word-break: break-all; }
+.jh-credit { color: #1677ff; font-weight: 600; font-variant-numeric: tabular-nums; }
+.jh-credit[data-tone="warn"] { color: #b45309; font-weight: 400; }
+.jh-credit[data-tone="muted"] { color: var(--muted); font-weight: 400; }
+.jh-creditExtra { color: var(--muted); font-size: 11px; margin-left: 4px; }
+
+.jh-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.jh-btn {
+  padding: 4px 10px; font-size: 12px; cursor: pointer;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--panel); color: var(--text);
+  transition: background .16s ease, border-color .16s ease;
+}
+.jh-btn:hover:not(:disabled) { border-color: #1677ff; color: #1677ff; }
+.jh-btn[data-kind="primary"] { background: #1677ff; border-color: #1677ff; color: #fff; }
+.jh-btn[data-kind="primary"]:hover:not(:disabled) { background: #0f5fce; color: #fff; }
+.jh-btn[data-kind="danger"] { color: #d93025; border-color: rgba(217,48,37,.35); }
+.jh-btn[data-kind="danger"]:hover:not(:disabled) { background: rgba(217,48,37,.07); }
+.jh-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+/* 模型行：开关用 appearance:none 自绘（原版最值得搬的一处） */
+.jh-modelRow {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 0; border-bottom: 1px solid var(--border);
+}
+.jh-modelRow:last-child { border-bottom: 0; }
+.jh-modelInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.jh-modelName { font-size: 12.5px; }
+.jh-modelId { font-size: 11px; color: var(--muted); font-family: ui-monospace, monospace; }
+.jh-modelRow[data-disabled="true"] .jh-modelInfo { opacity: .5; }
+.jh-switch {
+  appearance: none; -webkit-appearance: none; position: relative;
+  width: 34px; height: 19px; border-radius: 999px; flex: 0 0 34px;
+  background: rgba(154,160,166,.35); cursor: pointer; outline: none;
+  transition: background .16s ease;
+}
+.jh-switch::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 15px; height: 15px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 3px rgba(31,35,41,.25);
+  transition: transform .16s ease;
+}
+.jh-switch:checked { background: #1677ff; }
+.jh-switch:checked::after { transform: translateX(15px); }
+.jh-switch:disabled { opacity: .45; cursor: not-allowed; }
+
+.jh-bulkBar { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+
+/* 提示条：tone 决定左侧竖线与底色（原版 probeNotice 的三态语义） */
+.jh-notice {
+  border-left: 3px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; margin: 8px 0; font-size: 12px; line-height: 1.6;
+  background: rgba(154,160,166,.06);
+}
+.jh-notice[data-tone="ok"] { border-left-color: #22c55e; background: rgba(34,197,94,.07); }
+.jh-notice[data-tone="warn"] { border-left-color: #e37400; background: rgba(227,116,0,.07); }
+.jh-notice[data-tone="err"] { border-left-color: #d93025; background: rgba(217,48,37,.06); }
+.jh-notice ul { margin: 5px 0 0 18px; padding: 0; }
+.jh-notice li { margin: 2px 0; }
+.jh-empty { color: var(--muted); font-size: 12px; padding: 8px 0; }
+
+.jh-kv { display: grid; grid-template-columns: 92px minmax(0,1fr); gap: 3px 8px; font-size: 12px; margin: 0; }
+.jh-kv dt { color: var(--muted); }
+.jh-kv dd { margin: 0; word-break: break-all; }
+
+/* 备份弹窗：position:fixed 而非 portal（原版同款做法，纯 DOM 下天然可用） */
+.jh-modal {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(15,23,42,.45); align-items: center; justify-content: center;
+}
+.jh-modal[data-open="true"] { display: flex; }
+.jh-modalBox {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+  padding: 18px 20px; width: min(460px, 92vw);
+  box-shadow: 0 12px 40px rgba(15,23,42,.28);
+}
+.jh-modalHead { display: flex; align-items: center; margin-bottom: 10px; }
+.jh-modalHead strong { flex: 1; font-size: 14px; }
+.jh-sectionLabel { margin: 14px 0 6px; font-size: 12.5px; font-weight: 600; }
+
+/* 已选文件名回显：选中后变蓝加粗，让用户确认「确实选到了」 */
+.jh-fileName { font-size: 12px; color: var(--muted); align-self: center; word-break: break-all; }
+.jh-fileName[data-picked="true"] { color: #1677ff; font-weight: 600; }
+
+/* 「当前选用模型」提示条里的告警行（模型缺失 / 已被关闭 / 还没选） */
+.jh-sourceWarn { color: #b45309; margin-top: 3px; }
+.jh-notice[data-tone="warn"] .jh-sourceWarn { color: inherit; }

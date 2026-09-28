@@ -1,0 +1,2177 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>云端免费栈 · 配置</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --border: #e3e6ea;
+    --text: #1f2329;
+    --muted: #6b7280;
+    --accent: #2f6fed;
+    --accent-soft: #eaf1ff;
+    --ok: #16a34a;
+    --ok-soft: #e8f7ec;
+    --warn: #d97706;
+    --warn-soft: #fff5e6;
+    --err: #dc2626;
+    --err-soft: #fdecec;
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16181d;
+      --panel: #1e2128;
+      --border: #2e323b;
+      --text: #e8eaed;
+      --muted: #9aa1ad;
+      --accent: #7aa2f7;
+      --accent-soft: #232c40;
+      --ok: #4ade80;
+      --ok-soft: #1b2c22;
+      --warn: #fbbf24;
+      --warn-soft: #2e2617;
+      --err: #f87171;
+      --err-soft: #2e1c1c;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 13px/1.55 "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 14px 18px 12px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    flex: 0 0 auto;
+  }
+  .title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  h1 { font-size: 15px; margin: 0; font-weight: 600; }
+  .sub { color: var(--muted); font-size: 12px; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+  .pill {
+    font-size: 11px; padding: 2px 8px; border-radius: 999px;
+    border: 1px solid transparent; white-space: nowrap;
+  }
+  .pill.ok { background: var(--ok-soft); color: var(--ok); border-color: var(--ok); }
+  .pill.bad { background: var(--err-soft); color: var(--err); border-color: var(--err); }
+  nav { display: flex; gap: 4px; margin-top: 12px; flex-wrap: wrap; }
+  nav button {
+    border: 1px solid var(--border); background: transparent; color: var(--muted);
+    padding: 5px 11px; border-radius: 999px; cursor: pointer; font-size: 12px;
+  }
+  nav button.active {
+    background: var(--accent-soft); color: var(--accent);
+    border-color: var(--accent); font-weight: 600;
+  }
+  main { flex: 1 1 auto; overflow: auto; padding: 16px 18px 90px; }
+  section { display: none; }
+  section.active { display: block; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px;
+  }
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .label-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+  label { font-weight: 600; font-size: 12.5px; }
+  .layer {
+    font-size: 10.5px; padding: 1px 6px; border-radius: 4px;
+    background: var(--bg); color: var(--muted); border: 1px solid var(--border);
+  }
+  .layer.panel { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  .req { color: var(--err); font-size: 11px; }
+  .input-row { display: flex; gap: 6px; }
+  input, select {
+    width: 100%; padding: 7px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    font: inherit; font-size: 12.5px;
+  }
+  input:focus, select:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  .mini {
+    flex: 0 0 auto; padding: 7px 12px; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    font-size: 12px; white-space: nowrap;
+  }
+  .mini:hover { border-color: var(--accent); color: var(--accent); }
+  .help { color: var(--muted); font-size: 11.5px; margin-top: 4px; }
+  .help.ok { color: var(--ok); }
+  .help.err { color: var(--err); }
+  .checkline { display: flex; align-items: center; gap: 8px; }
+  .checkline input[type=checkbox] { width: auto; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .btn {
+    padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 12.5px;
+    border: 1px solid var(--border); background: var(--panel); color: var(--text);
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .btn:disabled { opacity: .55; cursor: not-allowed; }
+  .result {
+    margin-top: 10px; padding: 9px 11px; border-radius: 8px; font-size: 12px;
+    white-space: pre-wrap; word-break: break-word; display: none;
+  }
+  .result.show { display: block; }
+  .result.ok { background: var(--ok-soft); color: var(--ok); }
+  .result.err { background: var(--err-soft); color: var(--err); }
+  .kv { margin-top: 8px; font-size: 11.5px; color: var(--muted); }
+  .kv b { color: var(--text); font-weight: 600; }
+  audio { width: 100%; margin-top: 10px; }
+  .preview { max-width: 260px; border-radius: 8px; margin-top: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 11.5px; }
+  tr.group-row td {
+    background: var(--bg); color: var(--muted); font-size: 11px;
+    font-weight: 600; padding: 5px 8px;
+  }
+  td select { padding: 4px 6px; font-size: 12px; }
+  footer {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: var(--panel); border-top: 1px solid var(--border);
+    padding: 10px 18px; display: flex; gap: 8px; align-items: center;
+  }
+  .toast { margin-left: auto; font-size: 12px; color: var(--muted); }
+  .toast.ok { color: var(--ok); }
+  .toast.err { color: var(--err); }
+  .path { font-size: 11px; color: var(--muted); word-break: break-all; }
+  code { background: var(--bg); padding: 1px 5px; border-radius: 4px; font-size: 11.5px; }
+/* SPDX-License-Identifier: AGPL-3.0-only */
+/* ===========================================================================
+   云端 OAuth 分页的样式。
+   视觉语言借鉴原 Jet Hub 面板（jet-hub-styles.js），但做了三处**必要适配**：
+
+   1. **预计算颜色，不用 `color-mix()`** —— 原实现有 15 处 color-mix，
+      需 Chrome 111+，而原 bundle 的 target 是 chrome100。这里把混合结果
+      算好写死，观感一致且无版本门槛。
+   2. **走本面板自己的 CSS 变量**（`--bg/--panel/--text/--muted/--border`），
+      于是自动跟随本面板的深浅色 —— 原 Jet Hub 是不支持深色模式的。
+   3. 类名前缀 `jh-`，与面板既有的 `.card/.mini/.kv` 风格并存不冲突。
+
+   由 `dev_patch_panel_html.py` 注入到面板的样式块末尾之前。
+
+   ⚠ **本文件里绝不能出现 style 或 script 元素的尖括号标签文本**
+   （哪怕是写在注释里、哪怕是作为说明）。原因：style 元素在 HTML 里是
+   **raw text 元素**，解析器在其内部**不做标签解析、也不认 CSS 注释**，
+   一旦遇到结束标签就立刻关闭样式块，把后面所有 CSS 当成**页面可见文本**
+   渲染出来 —— 用户看到的就是「面板出现一大段乱码样式」。
+   本次开发真的踩了这个坑，而且是**连续两次**：第二次是修第一次时
+   把标签文本写进了说明注释里（见 docs/JETHUB.md F-004）。
+   同理，`cloud-oauth.js` 里也不能出现 script 元素的结束标签文本。
+   =========================================================================== */
+
+.jh-layout { display: flex; gap: 12px; align-items: flex-start; }
+.jh-rail {
+  width: 172px; flex: 0 0 172px; display: flex; flex-direction: column; gap: 2px;
+  max-height: 460px; overflow-y: auto; padding-right: 4px;
+}
+.jh-rail button {
+  display: flex; align-items: center; gap: 7px; width: 100%; text-align: left;
+  padding: 7px 10px; border: 1px solid transparent; border-radius: 9px;
+  background: transparent; color: var(--text); font-size: 12.5px; cursor: pointer;
+  transition: background .16s ease, border-color .16s ease;
+}
+.jh-rail button:hover { background: rgba(22,119,255,.07); }
+.jh-rail button[aria-selected="true"] {
+  background: rgba(22,119,255,.11); border-color: rgba(22,119,255,.28);
+  color: #1677ff; font-weight: 600;
+}
+.jh-dot { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 7px;
+  background: var(--muted); opacity: .45; }
+.jh-rail button[aria-selected="true"] .jh-dot { background: #1677ff; opacity: 1; }
+.jh-main { flex: 1; min-width: 0; }
+
+/* 账号卡：键值网格对齐 —— 原版「看起来整齐」的关键，纯 DOM 极易复刻 */
+.jh-card {
+  border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px;
+  margin-bottom: 10px; background: var(--panel);
+  box-shadow: 0 2px 8px rgba(31,35,41,.03);
+  transition: box-shadow .18s ease, opacity .18s ease;
+}
+.jh-card:hover { box-shadow: 0 5px 16px rgba(31,35,41,.06); }
+.jh-card[data-enabled="false"] { opacity: .62; }
+.jh-cardTop { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.jh-status { width: 8px; height: 8px; border-radius: 50%; background: #9aa0a6; flex: 0 0 8px; }
+.jh-card[data-enabled="true"] .jh-status {
+  background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.14);
+}
+.jh-name { font-weight: 600; font-size: 13px; }
+.jh-tag { font-size: 11px; padding: 1px 7px; border-radius: 999px; border: 1px solid transparent; }
+.jh-tag[data-tone="on"] { color: #15803d; background: rgba(34,197,94,.10); border-color: rgba(34,197,94,.22); }
+.jh-tag[data-tone="off"] { color: var(--muted); background: rgba(154,160,166,.12); border-color: rgba(154,160,166,.22); }
+.jh-tag[data-tone="warn"] { color: #b45309; background: rgba(227,116,0,.10); border-color: rgba(227,116,0,.22); }
+
+.jh-meta {
+  display: grid; grid-template-columns: 56px minmax(0,1fr);
+  gap: 3px 8px; align-items: baseline; margin: 0 0 8px; font-size: 12px;
+}
+.jh-meta dt { color: var(--muted); }
+.jh-meta dd { margin: 0; word-break: break-all; }
+.jh-credit { color: #1677ff; font-weight: 600; font-variant-numeric: tabular-nums; }
+.jh-credit[data-tone="warn"] { color: #b45309; font-weight: 400; }
+.jh-credit[data-tone="muted"] { color: var(--muted); font-weight: 400; }
+.jh-creditExtra { color: var(--muted); font-size: 11px; margin-left: 4px; }
+
+.jh-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.jh-btn {
+  padding: 4px 10px; font-size: 12px; cursor: pointer;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--panel); color: var(--text);
+  transition: background .16s ease, border-color .16s ease;
+}
+.jh-btn:hover:not(:disabled) { border-color: #1677ff; color: #1677ff; }
+.jh-btn[data-kind="primary"] { background: #1677ff; border-color: #1677ff; color: #fff; }
+.jh-btn[data-kind="primary"]:hover:not(:disabled) { background: #0f5fce; color: #fff; }
+.jh-btn[data-kind="danger"] { color: #d93025; border-color: rgba(217,48,37,.35); }
+.jh-btn[data-kind="danger"]:hover:not(:disabled) { background: rgba(217,48,37,.07); }
+.jh-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+/* 模型行：开关用 appearance:none 自绘（原版最值得搬的一处） */
+.jh-modelRow {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 0; border-bottom: 1px solid var(--border);
+}
+.jh-modelRow:last-child { border-bottom: 0; }
+.jh-modelInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.jh-modelName { font-size: 12.5px; }
+.jh-modelId { font-size: 11px; color: var(--muted); font-family: ui-monospace, monospace; }
+.jh-modelRow[data-disabled="true"] .jh-modelInfo { opacity: .5; }
+.jh-switch {
+  appearance: none; -webkit-appearance: none; position: relative;
+  width: 34px; height: 19px; border-radius: 999px; flex: 0 0 34px;
+  background: rgba(154,160,166,.35); cursor: pointer; outline: none;
+  transition: background .16s ease;
+}
+.jh-switch::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 15px; height: 15px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 3px rgba(31,35,41,.25);
+  transition: transform .16s ease;
+}
+.jh-switch:checked { background: #1677ff; }
+.jh-switch:checked::after { transform: translateX(15px); }
+.jh-switch:disabled { opacity: .45; cursor: not-allowed; }
+
+.jh-bulkBar { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+
+/* 提示条：tone 决定左侧竖线与底色（原版 probeNotice 的三态语义） */
+.jh-notice {
+  border-left: 3px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; margin: 8px 0; font-size: 12px; line-height: 1.6;
+  background: rgba(154,160,166,.06);
+}
+.jh-notice[data-tone="ok"] { border-left-color: #22c55e; background: rgba(34,197,94,.07); }
+.jh-notice[data-tone="warn"] { border-left-color: #e37400; background: rgba(227,116,0,.07); }
+.jh-notice[data-tone="err"] { border-left-color: #d93025; background: rgba(217,48,37,.06); }
+.jh-notice ul { margin: 5px 0 0 18px; padding: 0; }
+.jh-notice li { margin: 2px 0; }
+.jh-empty { color: var(--muted); font-size: 12px; padding: 8px 0; }
+
+.jh-kv { display: grid; grid-template-columns: 92px minmax(0,1fr); gap: 3px 8px; font-size: 12px; margin: 0; }
+.jh-kv dt { color: var(--muted); }
+.jh-kv dd { margin: 0; word-break: break-all; }
+
+/* 备份弹窗：position:fixed 而非 portal（原版同款做法，纯 DOM 下天然可用） */
+.jh-modal {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(15,23,42,.45); align-items: center; justify-content: center;
+}
+.jh-modal[data-open="true"] { display: flex; }
+.jh-modalBox {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+  padding: 18px 20px; width: min(460px, 92vw);
+  box-shadow: 0 12px 40px rgba(15,23,42,.28);
+}
+.jh-modalHead { display: flex; align-items: center; margin-bottom: 10px; }
+.jh-modalHead strong { flex: 1; font-size: 14px; }
+.jh-sectionLabel { margin: 14px 0 6px; font-size: 12.5px; font-weight: 600; }
+
+/* 已选文件名回显：选中后变蓝加粗，让用户确认「确实选到了」 */
+.jh-fileName { font-size: 12px; color: var(--muted); align-self: center; word-break: break-all; }
+.jh-fileName[data-picked="true"] { color: #1677ff; font-weight: 600; }
+
+/* 「当前选用模型」提示条里的告警行（模型缺失 / 已被关闭 / 还没选） */
+.jh-sourceWarn { color: #b45309; margin-top: 3px; }
+.jh-notice[data-tone="warn"] .jh-sourceWarn { color: inherit; }
+
+</style>
+</head>
+<body>
+<header>
+  <div class="title-row">
+    <h1>云端免费栈 · 配置</h1>
+    <span class="sub">MiMo 配音 + OpenAI 兼容语言模型 / 商汤图片模型</span>
+    <span class="pills" id="pills"></span>
+  </div>
+  <nav id="tabs"></nav>
+</header>
+
+<main>
+  <section id="tab-mimo" class="active">
+    <div class="card" id="card-mimo"></div>
+    <div class="card">
+      <div class="label-row"><label>克隆音色</label><span class="sub">上传 10-30 秒干净人声，用 mimo-v2.5-tts-voiceclone 复刻</span></div>
+      <div class="help">
+        建议安静环境、单人说话、10-30 秒；mp3 / wav / m4a 均可，≤ 8MB。<br />
+        克隆音色会出现在「音色映射表」的目标下拉里；合成时自动切换 voiceclone 模型，
+        每次请求内联参考音频，长文合成会比预置音色慢。
+      </div>
+      <div class="input-row">
+        <input id="clone-name" placeholder="音色名（如：老板音）" style="max-width:180px" />
+        <input id="clone-file" type="file" accept=".mp3,.wav,.m4a,.aac,.ogg,.flac,audio/*" style="flex:1" />
+      </div>
+      <div class="actions">
+        <button class="mini" id="btn-clone-upload">上传克隆音色</button>
+      </div>
+      <div id="clone-list"></div>
+    </div>
+    <div class="card">
+      <div class="label-row"><label>试听测试</label><span class="sub">会真实调用一次 MiMo，消耗极少量免费额度</span></div>
+      <div class="input-row">
+        <input id="tts-text" placeholder="试听文本（可留空）" />
+        <button class="mini" id="btn-tts">开始试听</button>
+      </div>
+      <div class="result" id="tts-result"></div>
+      <div class="kv" id="tts-detail"></div>
+      <audio id="tts-audio" controls style="display:none"></audio>
+    </div>
+  </section>
+
+  <section id="tab-voice">
+    <div class="card">
+      <div class="label-row">
+        <label>音色映射表</label>
+        <span class="sub">把 OCV 前端的音色名映射到 MiMo 预置音色或克隆音色</span>
+      </div>
+      <div class="help">
+        OCV 的音色下拉是前端写死的，插件不改前端，因此在配音调用前做一次映射。<br />
+        选「跟随默认」表示不在表里指定，回退到上面设的默认音色。
+      </div>
+      <div class="actions">
+        <button class="mini" id="btn-map-smart">按性别自动映射</button>
+        <button class="mini" id="btn-map-clear">全部清空</button>
+      </div>
+      <div style="margin-top:12px; overflow:auto; max-height:52vh;">
+        <table>
+          <thead><tr><th style="width:46%">OCV 音色</th><th>MiMo 音色</th></tr></thead>
+          <tbody id="voice-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-llm">
+    <div class="card" id="card-llm"></div>
+    <div class="card">
+      <div class="label-row"><label>连通性测试</label><span class="sub">按当前启用的**模型来源**实测一次：自行填 API 或云端 OAuth，测试结果会标出打的是哪一路</span></div>
+      <div class="actions"><button class="mini" id="btn-llm">测试 JSON 输出</button></div>
+      <div class="result" id="llm-result"></div>
+      <div class="kv" id="llm-detail"></div>
+    </div>
+  </section>
+
+  <section id="tab-image">
+    <div class="card" id="card-image"></div>
+    <div class="card">
+      <div class="label-row"><label>出图测试</label><span class="sub">直接打商汤同步接口，不经 OCV</span></div>
+      <div class="input-row">
+        <input id="img-prompt" placeholder="提示词（可留空）" />
+        <button class="mini" id="btn-img">出一张图</button>
+      </div>
+      <div class="result" id="img-result"></div>
+      <div class="kv" id="img-detail"></div>
+      <img class="preview" id="img-preview" style="display:none" alt="测试图" />
+    </div>
+  </section>
+
+  <section id="tab-video">
+    <div class="card" id="card-video"></div>
+    <div class="card">
+      <div class="label-row"><label>启用方式</label><span class="sub">视频按秒计费，默认不接管</span></div>
+      <ol class="sub" style="margin:6px 0 0 18px;line-height:1.75">
+        <li>在插件目录运行 <code>cloud_stack_ctl.py video-install</code>（把 OCV 视频链路指向本地 shim）</li>
+        <li>在本页填 Agnes API Key，并把「启用云端视频接管」打开</li>
+        <li>重启 OCV 生效</li>
+      </ol>
+      <div class="kv" id="video-status"></div>
+    </div>
+  </section>
+
+  <section id="tab-jethub">
+    <!-- JETHUB_* 开关字段由 renderGroup 渲染到这里 -->
+    <div class="card" id="card-jethub"></div>
+
+    <div class="card">
+      <div class="label-row">
+        <label>桥运行状态</label>
+        <span class="sub">本机 Node 桥，供 OCV 当 OpenAI 兼容服务商使用</span>
+      </div>
+      <dl class="jh-kv" id="jethub-bridge"></dl>
+      <div class="jh-actions" style="margin-top:10px">
+        <button class="jh-btn" data-kind="primary" id="btn-jethub-ensure">启动 / 重启桥</button>
+        <button class="jh-btn" id="btn-jethub-stop">停止桥</button>
+        <button class="jh-btn" id="btn-jethub-refresh">刷新状态</button>
+      </div>
+      <div class="jh-notice" id="jethub-login-hint" style="display:none"></div>
+    </div>
+
+    <div class="card">
+      <div class="label-row">
+        <label>账号</label>
+        <span class="sub">多账号：额度耗尽时自动轮换</span>
+      </div>
+      <div class="jh-layout">
+        <!-- 左栏：提供商。**这是唯一的提供商选择入口** ——
+             原先顶部字段卡里还有一个「提供商」下拉，与它重复，已删除
+             （用户要求：有下面这个账号管理窗口就不需要上面的提供商选择了）。 -->
+        <nav class="jh-rail" id="jethub-providers" aria-label="提供商"></nav>
+        <div class="jh-main">
+          <div class="jh-actions" style="margin-bottom:10px">
+            <input class="input" id="jethub-nickname" placeholder="备注名（可留空）"
+                   style="flex:1;min-width:110px;font-size:12px;padding:4px 8px">
+            <button class="jh-btn" data-kind="primary" id="btn-jethub-login">新增账号</button>
+            <button class="jh-btn" id="btn-jethub-balances">刷新积分</button>
+            <button class="jh-btn" data-kind="primary" id="btn-jethub-checkin">一键签到</button>
+          </div>
+          <div class="jh-notice" id="jethub-checkin-result" style="display:none"></div>
+          <div id="jethub-accounts"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label-row">
+        <label>模型显示列表</label>
+        <span class="sub">黑名单制：关掉的不出现在 OCV 的模型下拉里</span>
+      </div>
+      <div class="jh-bulkBar">
+        <button class="jh-btn" id="btn-jethub-models">刷新模型</button>
+        <button class="jh-btn" id="btn-jethub-models-all-on">打开全部</button>
+        <button class="jh-btn" id="btn-jethub-models-all-off">关闭全部</button>
+        <button class="jh-btn" id="btn-jethub-test">对话测试</button>
+      </div>
+      <div class="jh-notice" id="jethub-test-result" style="display:none"></div>
+      <div id="jethub-models"></div>
+    </div>
+
+    <!-- 备份 / 恢复：**直接展开在本页**，不再弹窗
+         （用户要求：不要另外弹窗，分开放在面板中） -->
+    <div class="card">
+      <div class="label-row">
+        <label>备份</label>
+        <span class="sub">导出全部提供商的账号与凭据</span>
+      </div>
+      <div class="jh-notice" data-tone="warn" style="margin-top:0">
+        备份文件<b>含凭据明文</b>。请只保存在自己信任的位置；如需跨机器传输，请自行加密。
+      </div>
+      <div class="jh-actions">
+        <button class="jh-btn" data-kind="primary" type="button"
+                id="btn-jh-backup-export-download">下载到本地</button>
+        <button class="jh-btn" type="button" id="btn-jh-backup-export-server">留档到插件目录</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label-row">
+        <label>恢复</label>
+        <span class="sub">从本地上传备份文件</span>
+      </div>
+      <div class="jh-actions">
+        <button class="jh-btn" data-kind="primary" type="button" id="btn-jh-backup-pick">
+          选择备份文件…
+        </button>
+        <span class="jh-fileName" id="jh-backup-filename">（未选择文件）</span>
+      </div>
+      <!-- 隐藏的真实 file input，由上面的按钮 click() 唤起系统文件选择框 -->
+      <input type="file" id="jh-backup-file" accept=".json,application/json" style="display:none">
+      <div class="jh-actions" style="margin-top:8px">
+        <button class="jh-btn" type="button" id="btn-jh-backup-import">开始恢复</button>
+      </div>
+      <div class="jh-notice" style="margin-bottom:0">
+        恢复时可选<b>合并</b>（同名覆盖、其余保留）或<b>替换</b>（先清空）——
+        在弹出的确认框里选「确定」= 合并，「取消」= 替换。
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-misc">
+    <div class="card" id="card-misc"></div>
+    <div class="card">
+      <div class="label-row"><label>运行状态</label></div>
+      <div class="kv" id="misc-status"></div>
+      <div class="actions" style="margin-top:10px">
+        <button class="mini" id="btn-open-ocv">打开 OCV 界面</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <button class="btn primary" id="btn-save">保存并立即生效</button>
+  <button class="btn" id="btn-reload">重新读取</button>
+  <button class="btn" id="btn-reset">清空覆盖层</button>
+  <span class="toast" id="toast"></span>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var API = location.origin;
+  var state = null;
+  var drafts = {};
+  var draftVoices = {};
+  // 只有用户真的动过映射表才回传，否则"顺手保存其它字段"会把已有映射清空。
+  var voiceDirty = false;
+  // 动态模型下拉：字段 key -> 服务商 /models 实际返回的清单
+  var modelOptions = {};
+  var MODEL_KIND_LABEL = { llm: "语言模型", image: "图片模型", image_edit: "图生图模型", tts: "配音模型" };
+
+  function el(id) { return document.getElementById(id); }
+  function h(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined && text !== null) node.textContent = text;
+    return node;
+  }
+  function toast(message, kind) {
+    var box = el("toast");
+    box.textContent = message || "";
+    box.className = "toast" + (kind ? " " + kind : "");
+    if (message) setTimeout(function () { if (box.textContent === message) box.className = "toast"; }, 6000);
+  }
+  function showResult(node, ok, message) {
+    node.className = "result show " + (ok ? "ok" : "err");
+    node.textContent = message || "";
+  }
+  function renderDetail(node, detail) {
+    node.innerHTML = "";
+    if (!detail) return;
+    Object.keys(detail).forEach(function (key) {
+      var value = detail[key];
+      if (value === null || value === undefined || value === "") return;
+      var row = h("div");
+      row.appendChild(h("b", null, key + "："));
+      row.appendChild(document.createTextNode(String(value)));
+      node.appendChild(row);
+    });
+  }
+
+  function request(path, options) {
+    var opts = options || {};
+    return fetch(API + path, {
+      method: opts.method || "GET",
+      headers: opts.body ? { "Content-Type": "application/json" } : undefined,
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    }).then(function (response) {
+      return response.json().catch(function () { return { ok: false, message: "HTTP " + response.status }; });
+    });
+  }
+
+  // ---------------- 渲染 ----------------
+
+  function renderPills(status) {
+    var box = el("pills");
+    box.innerHTML = "";
+    var pills = [
+      ["MiMo 配音", status.mimo_configured],
+      ["语言模型", status.llm_configured],
+      ["图片模型", status.image_configured],
+      ["本地 shim", status.shim_matches_env]
+    ];
+    // 视频是可选能力且默认关闭，所以只在**开启后**才显示状态灯 ——
+    // 否则默认配置下会多一个红色的「未就绪」，误导用户以为坏了。
+    if (status.video && status.video.enabled) {
+      pills.push(["云端视频", status.agnes_configured]);
+    }
+    pills.forEach(function (item) {
+      box.appendChild(h("span", "pill " + (item[1] ? "ok" : "bad"), item[0] + (item[1] ? " 已就绪" : " 未就绪")));
+    });
+  }
+
+  function layerBadge(key) {
+    var layer = state.layers[key] || "default";
+    var text = { panel: "面板覆盖", environ: ".env", env: ".env", "default": "默认值" }[layer] || layer;
+    return h("span", "layer" + (layer === "panel" ? " panel" : ""), text);
+  }
+
+  // ---------------- 动态模型下拉（自动读取服务商可用模型） ----------------
+
+  function currentValue(field) {
+    return drafts[field.key] !== undefined ? drafts[field.key] : (state.values[field.key] || "");
+  }
+
+  function credentialOf(name) {
+    if (!name) return "";
+    return drafts[name] !== undefined ? drafts[name] : (state.values[name] || "");
+  }
+
+  function signatureOf(field) {
+    var creds = field.credentials || {};
+    return [field.dynamic_models, credentialOf(creds.api_key), credentialOf(creds.api_base)].join("|");
+  }
+
+  // 同一个用途、同一套凭据的字段共享一次请求（文生图 / 图生图两个下拉就是这种关系）
+  function siblingFields(field) {
+    var signature = signatureOf(field);
+    return (state.fields || []).filter(function (other) {
+      return other.dynamic_models === field.dynamic_models && signatureOf(other) === signature;
+    });
+  }
+
+  function setModelStatus(field, kind, message) {
+    var node = el("model-status-" + field.key);
+    if (!node) return;
+    node.className = "help" + (kind === "err" ? " err" : (kind === "ok" ? " ok" : ""));
+    node.textContent = message || "";
+  }
+
+  function fillSelect(select, field, models) {
+    var value = currentValue(field);
+    var options = (models && models.length ? models : (field.options || [])).slice();
+    select.innerHTML = "";
+    if (!value) {
+      var empty = document.createElement("option");
+      empty.value = "";
+      empty.textContent = "（未设置，使用默认）";
+      select.appendChild(empty);
+    }
+    var known = false;
+    options.forEach(function (option) {
+      var node = document.createElement("option");
+      node.value = option.value;
+      node.textContent = option.label || option.value;
+      if (option.value === value) known = true;
+      select.appendChild(node);
+    });
+    if (field.allow_custom) {
+      var custom = document.createElement("option");
+      custom.value = "__custom__";
+      // 当前值不在清单里（服务商下架了，或手填的）时，别让它从下拉里消失
+      custom.textContent = value && !known ? "自定义：" + value : "自定义…";
+      select.appendChild(custom);
+    }
+    select.value = value && !known && field.allow_custom ? "__custom__" : (value || "");
+  }
+
+  function applyModelOptions(field, models) {
+    if (!models || !models.length) return;
+    modelOptions[field.key] = models;
+    var select = document.querySelector('select[data-key="' + field.key + '"]');
+    if (select) fillSelect(select, field, models);
+  }
+
+  function fetchModelsFor(fields, force) {
+    if (!fields.length) return;
+    var first = fields[0];
+    var kind = first.dynamic_models;
+    var creds = first.credentials || {};
+    var label = MODEL_KIND_LABEL[kind] || "模型";
+    fields.forEach(function (field) { setModelStatus(field, "loading", "正在读取" + label + "列表…"); });
+    return request("/api/panel/models", {
+      method: "POST",
+      body: {
+        kind: kind,
+        api_key: credentialOf(creds.api_key),
+        api_base: credentialOf(creds.api_base),
+        force: !!force
+      }
+    }).then(function (payload) {
+      fields.forEach(function (field) {
+        if (!payload.ok) {
+          setModelStatus(field, "err", payload.message || "读取模型列表失败");
+          return;
+        }
+        applyModelOptions(field, payload.models);
+        setModelStatus(field, "ok",
+          (payload.message || "已更新列表") + (payload.cached ? "（缓存）" : "") + "，点下拉直接选择");
+      });
+    }).catch(function (error) {
+      fields.forEach(function (field) { setModelStatus(field, "err", "读取模型列表失败：" + error); });
+    });
+  }
+
+  function loadAllModels() {
+    var seen = {};
+    (state.fields || []).forEach(function (field) {
+      if (!field.dynamic_models) return;
+      var signature = signatureOf(field);
+      if (seen[signature]) return;
+      seen[signature] = siblingFields(field);
+      fetchModelsFor(seen[signature], false);
+    });
+  }
+
+  function buildField(field) {
+    var wrap = h("div", "field");
+    var row = h("div", "label-row");
+    row.appendChild(h("label", null, field.label));
+    if (field.required) row.appendChild(h("span", "req", "必填"));
+    row.appendChild(layerBadge(field.key));
+    if (field.restart) row.appendChild(h("span", "layer", "需重启"));
+    wrap.appendChild(row);
+
+    var value = drafts[field.key] !== undefined ? drafts[field.key] : (state.values[field.key] || "");
+    var input;
+
+    if (field.type === "bool") {
+      var line = h("div", "checkline");
+      input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = String(value) === "1";
+      input.dataset.key = field.key;
+      input.addEventListener("change", function () {
+        drafts[field.key] = input.checked ? "1" : "0";
+      });
+      line.appendChild(input);
+      line.appendChild(h("span", null, "启用"));
+      wrap.appendChild(line);
+    } else if (field.type === "select") {
+      var dynamicKind = field.dynamic_models || "";
+      var selectRow = h("div", "input-row");
+      input = document.createElement("select");
+      input.dataset.key = field.key;
+      fillSelect(input, field, dynamicKind ? modelOptions[field.key] : null);
+      input.addEventListener("change", function () {
+        if (input.value === "__custom__") {
+          var typed = window.prompt("输入自定义值（" + field.label + "）", drafts[field.key] || field.default || "");
+          drafts[field.key] = typed === null ? "" : typed;
+          fillSelect(input, field, dynamicKind ? modelOptions[field.key] : null);
+          return;
+        }
+        drafts[field.key] = input.value;
+      });
+      selectRow.appendChild(input);
+      if (dynamicKind) {
+        var reload = h("button", "mini", "↻ 模型");
+        reload.type = "button";
+        reload.title = "重新从服务商读取可用模型列表";
+        reload.addEventListener("click", function () { fetchModelsFor(siblingFields(field), true); });
+        selectRow.appendChild(reload);
+      }
+      wrap.appendChild(selectRow);
+      if (dynamicKind) {
+        var modelStatus = h("div", "help");
+        modelStatus.id = "model-status-" + field.key;
+        var cached = state.model_cache && state.model_cache[dynamicKind];
+        modelStatus.textContent = cached
+          ? "本地缓存的清单：" + cached.count + " 个模型，正在向服务商核对…"
+          : "正在读取服务商可用模型…";
+        wrap.appendChild(modelStatus);
+      }
+    } else {
+      var line2 = h("div", "input-row");
+      input = document.createElement("input");
+      input.dataset.key = field.key;
+      input.type = field.type === "password" ? "password" : (field.type === "number" ? "number" : "text");
+      if (field.min !== undefined) input.min = field.min;
+      if (field.max !== undefined) input.max = field.max;
+      input.placeholder = field.placeholder || "";
+      input.value = value;
+      input.addEventListener("input", function () { drafts[field.key] = input.value; });
+      line2.appendChild(input);
+      if (field.secret) {
+        var toggle = h("button", "mini", "显示");
+        toggle.type = "button";
+        toggle.addEventListener("click", function () {
+          var hidden = input.type === "password";
+          input.type = hidden ? "text" : "password";
+          toggle.textContent = hidden ? "隐藏" : "显示";
+        });
+        line2.appendChild(toggle);
+      }
+      wrap.appendChild(line2);
+    }
+
+    if (field.help) wrap.appendChild(h("div", "help", field.help));
+    if (field.default && !state.values[field.key]) {
+      wrap.appendChild(h("div", "help", "当前会使用默认值：" + field.default));
+    }
+    return wrap;
+  }
+
+  function renderGroup(groupKey) {
+    var card = el("card-" + groupKey);
+    if (!card) return;
+    card.innerHTML = "";
+    state.fields.filter(function (field) { return field.group === groupKey; }).forEach(function (field) {
+      card.appendChild(buildField(field));
+    });
+  }
+
+  function renderVoices() {
+    var body = el("voice-body");
+    body.innerHTML = "";
+    var lastGroup = null;
+    state.ocv_voices.forEach(function (row) {
+      if (row.group !== lastGroup) {
+        lastGroup = row.group;
+        var groupRow = document.createElement("tr");
+        groupRow.className = "group-row";
+        var cell = document.createElement("td");
+        cell.colSpan = 2;
+        cell.textContent = row.group;
+        groupRow.appendChild(cell);
+        body.appendChild(groupRow);
+      }
+      var tr = document.createElement("tr");
+      var nameCell = document.createElement("td");
+      nameCell.appendChild(h("div", null, row.value));
+      nameCell.appendChild(h("div", "help", row.label));
+      tr.appendChild(nameCell);
+
+      var selectCell = document.createElement("td");
+      var select = document.createElement("select");
+      var empty = document.createElement("option");
+      empty.value = "";
+      empty.textContent = "跟随默认";
+      select.appendChild(empty);
+      state.mimo_voices.forEach(function (voice) {
+        var option = document.createElement("option");
+        option.value = voice.value;
+        option.textContent = voice.label;
+        select.appendChild(option);
+      });
+      (state.clone_voices || []).forEach(function (voice) {
+        var option = document.createElement("option");
+        option.value = voice.value;
+        option.textContent = "克隆 · " + voice.value + (voice.missing ? "（音频丢失）" : "");
+        select.appendChild(option);
+      });
+      select.value = draftVoices[row.value] !== undefined ? draftVoices[row.value] : (row.target || "");
+      select.addEventListener("change", function () {
+        draftVoices[row.value] = select.value;
+        voiceDirty = true;
+      });
+      selectCell.appendChild(select);
+      tr.appendChild(selectCell);
+      body.appendChild(tr);
+    });
+  }
+
+  function renderMisc() {
+    var box = el("misc-status");
+    box.innerHTML = "";
+    var status = state.status;
+    var rows = [
+      ["本地 shim 地址", status.shim_base_url],
+      ["OCV 图片基址", state.readonly_env.IMAGE_API_BASE_URL || "（空）"],
+      ["语言模型 provider", state.readonly_env.LANGUAGE_PROVIDER || "（空）"],
+      ["图片模型 ID", state.readonly_env.IMAGE_MODEL_ID || "（空）"],
+      ["面板覆盖层", status.store_path],
+      ["env 基线", status.env_path]
+    ];
+    var cache = state.model_cache || {};
+    var cachedKinds = Object.keys(cache).map(function (kind) {
+      return (MODEL_KIND_LABEL[kind] || kind) + " " + cache[kind].count + " 个";
+    });
+    rows.push([
+      "模型清单缓存",
+      cachedKinds.length ? cachedKinds.join("，") + "（打开面板时会自动向服务商核对）" : "（尚未读取过）"
+    ]);
+    rows.forEach(function (row) {
+      var line = h("div");
+      line.appendChild(h("b", null, row[0] + "："));
+      line.appendChild(h("span", null, row[1]));
+      box.appendChild(line);
+    });
+    var note = h("div", "help");
+    note.textContent = status.shim_matches_env
+      ? "配置一致，OCV 生图会走到本地 shim。"
+      : "注意：OCV 的 IMAGE_API_BASE_URL 与 shim 地址不一致，生图不会经过本插件。运行 cloud_stack_ctl.py install 修正。";
+    box.appendChild(note);
+  }
+
+  function formatCloneSize(bytes) {
+    var n = Number(bytes) || 0;
+    if (n >= 1024 * 1024) return (n / 1024 / 1024).toFixed(1) + "MB";
+    if (n >= 1024) return Math.round(n / 1024) + "KB";
+    return n + "B";
+  }
+
+  function renderCloneVoices() {
+    var box = el("clone-list");
+    if (!box) return;
+    box.innerHTML = "";
+    var list = state.clone_voices || [];
+    if (!list.length) {
+      box.innerHTML = '<div class="help">还没有克隆音色。上传参考音频后，到「音色映射」分页把 OCV 音色映射到它。</div>';
+      return;
+    }
+    list.forEach(function (voice) {
+      var row = document.createElement("div");
+      row.className = "input-row";
+      row.style.marginTop = "6px";
+      var info = document.createElement("span");
+      info.style.flex = "1";
+      info.textContent = "克隆 · " + voice.value + "（" + formatCloneSize(voice.bytes)
+        + (voice.uploaded_at ? "，" + voice.uploaded_at : "") + "）"
+        + (voice.missing ? " ⚠ 音频文件丢失，请重新上传" : "");
+      var tryBtn = document.createElement("button");
+      tryBtn.className = "mini";
+      tryBtn.textContent = "试听";
+      tryBtn.addEventListener("click", function () { previewClone(voice.value, tryBtn); });
+      var delBtn = document.createElement("button");
+      delBtn.className = "mini";
+      delBtn.textContent = "删除";
+      delBtn.addEventListener("click", function () {
+        if (!window.confirm("删除克隆音色「" + voice.value + "」？已保存的映射会失效。")) return;
+        request("/api/panel/voice/delete", { method: "POST", body: { name: voice.value } })
+          .then(function (payload) {
+            if (!payload.ok) { toast(payload.message || "删除失败", "err"); return; }
+            state.clone_voices = payload.clone_voices || [];
+            render();
+            toast(payload.message, "ok");
+          });
+      });
+      row.appendChild(info);
+      row.appendChild(tryBtn);
+      row.appendChild(delBtn);
+      box.appendChild(row);
+    });
+  }
+
+  function previewClone(name, button) {
+    button.disabled = true;
+    showResult(el("tts-result"), true, "正在用克隆音色「" + name + "」合成…");
+    el("tts-detail").innerHTML = "";
+    el("tts-audio").style.display = "none";
+    request("/api/panel/test/tts", { method: "POST", body: { voice: name, text: el("tts-text").value } })
+      .then(function (payload) {
+        button.disabled = false;
+        showResult(el("tts-result"), payload.ok, payload.message);
+        renderDetail(el("tts-detail"), payload.detail);
+        if (payload.ok && payload.audio) {
+          var audio = el("tts-audio");
+          audio.src = payload.audio;
+          audio.style.display = "block";
+          audio.play().catch(function () {});
+        }
+      })
+      .catch(function () { button.disabled = false; });
+  }
+
+  el("btn-clone-upload").addEventListener("click", function () {
+    var nameInput = el("clone-name");
+    var fileInput = el("clone-file");
+    var name = (nameInput.value || "").trim();
+    var file = fileInput.files && fileInput.files[0];
+    if (!name) { toast("请先填音色名", "err"); return; }
+    if (!file) { toast("请先选择参考音频文件", "err"); return; }
+    if (file.size > 8 * 1024 * 1024) { toast("音频超过 8MB，请裁剪到 30 秒左右", "err"); return; }
+    var button = el("btn-clone-upload");
+    button.disabled = true;
+    var reader = new FileReader();
+    reader.onload = function () {
+      request("/api/panel/voice/upload", {
+        method: "POST",
+        body: { name: name, audio: String(reader.result) }
+      }).then(function (payload) {
+        button.disabled = false;
+        if (!payload.ok) { toast(payload.message || "上传失败", "err"); return; }
+        state.clone_voices = payload.clone_voices || [];
+        nameInput.value = "";
+        fileInput.value = "";
+        render();
+        toast(payload.message + "，已可在「音色映射」里使用", "ok");
+      }).catch(function () { button.disabled = false; });
+    };
+    reader.onerror = function () { button.disabled = false; toast("读取文件失败", "err"); };
+    reader.readAsDataURL(file);
+  });
+
+  function render() {
+    renderPills(state.status);
+    // 分页先建（依赖 state.groups），再渲染各分组内容。
+    renderTabs();
+    var keys = (state.groups || []).map(function (item) { return item.key; });
+    if (!keys.length) keys = ["mimo", "llm", "image", "misc"];
+    keys.forEach(renderGroup);
+    renderVoices();
+    renderCloneVoices();
+    renderMisc();
+    renderVideoStatus();
+    // 云端 OAuth 分页：状态是**异步**取的（要打桥），先渲染骨架
+    // （此时 jethubState 可能还是 null，renderJetHub 会安全早退），
+    // 再发起请求，回来后重渲染。
+    renderJetHub();
+    refreshJetHub();
+  }
+
+  function renderVideoStatus() {
+    var box = el("video-status");
+    if (!box) return;
+    var status = (state && state.status) || {};
+    var video = status.video || {};
+    box.innerHTML = "";
+    var rows = [
+      ["接管开关", video.enabled ? "已开启" : "未开启（默认）"],
+      ["视频模型", video.model || "（未读取）"],
+      ["上游地址", video.base || "（未读取）"],
+      ["输出档位", video.size || "（未读取）"],
+      ["模式策略", video.mode || "（未读取）"],
+      ["Agnes Key", status.agnes_configured ? "已配置" : "未配置"],
+      ["任务统计", video.tasks === undefined ? "（未读取）" :
+        (video.tasks + " 个，运行中 " + (video.running || 0))]
+    ];
+    rows.forEach(function (row) {
+      var line = h("div");
+      line.appendChild(h("b", null, row[0] + "："));
+      line.appendChild(h("span", null, row[1]));
+      box.appendChild(line);
+    });
+    var note = h("div", "help");
+    note.textContent = video.enabled
+      ? "云端视频接管已开启：OCV 的视频请求会经本地 shim 翻译后发往 " + (video.base || "Agnes") + "。"
+      : "云端视频接管未开启，OCV 视频链路完全走它自己的原生配置。开启前请先运行 video-install。";
+    box.appendChild(note);
+  }
+
+  function load() {
+    return request("/api/panel/state").then(function (payload) {
+      if (!payload.ok) { toast(payload.message || "读取失败", "err"); return; }
+      state = payload.data;
+      drafts = {};
+      draftVoices = {};
+      modelOptions = {};
+      render();
+      // 自动读取服务商当前可用的模型清单；读不到也不影响面板其它部分
+      loadAllModels();
+    });
+  }
+
+  // ---------------- 交互 ----------------
+
+  function save() {
+    var body = { values: drafts };
+    if (voiceDirty) {
+      var voiceMap = {};
+      Object.keys(draftVoices).forEach(function (key) {
+        if (draftVoices[key]) voiceMap[key] = draftVoices[key];
+      });
+      body.voice_map = voiceMap;
+    }
+    toast("保存中…");
+    return request("/api/panel/save", { method: "POST", body: body }).then(function (payload) {
+      if (!payload.ok) { toast(payload.message || "保存失败", "err"); return; }
+      state = payload.data;
+      drafts = {};
+      draftVoices = {};
+      voiceDirty = false;
+      render();
+      toast("已保存，立即生效（无需重启 OCV）", "ok");
+    });
+  }
+
+  function runTest(url, options) {
+    return request(url, options);
+  }
+
+  el("btn-save").addEventListener("click", save);
+
+  el("btn-reload").addEventListener("click", function () {
+    load().then(function () { toast("已重新读取", "ok"); });
+  });
+
+  el("btn-reset").addEventListener("click", function () {
+    if (!window.confirm("清空面板覆盖层？所有配置将回退到 .env 与默认值。")) return;
+    request("/api/panel/reset", { method: "POST", body: {} }).then(function (payload) {
+      if (!payload.ok) { toast(payload.message || "操作失败", "err"); return; }
+      state = payload.data;
+      drafts = {};
+      draftVoices = {};
+      voiceDirty = false;
+      render();
+      toast("已清空覆盖层", "ok");
+    });
+  });
+
+  el("btn-tts").addEventListener("click", function () {
+    var button = el("btn-tts");
+    button.disabled = true;
+    showResult(el("tts-result"), true, "合成中…");
+    el("tts-detail").innerHTML = "";
+    el("tts-audio").style.display = "none";
+    request("/api/panel/test/tts", {
+      method: "POST",
+      body: { text: el("tts-text").value, voice: drafts.MIMO_TTS_VOICE || "" }
+    }).then(function (payload) {
+      showResult(el("tts-result"), payload.ok, payload.message);
+      renderDetail(el("tts-detail"), payload.detail);
+      if (payload.ok && payload.audio) {
+        var audio = el("tts-audio");
+        audio.src = payload.audio;
+        audio.style.display = "block";
+        audio.play().catch(function () {});
+      }
+    }).catch(function (error) {
+      showResult(el("tts-result"), false, String(error));
+    }).then(function () { button.disabled = false; });
+  });
+
+  el("btn-llm").addEventListener("click", function () {
+    var button = el("btn-llm");
+    button.disabled = true;
+    showResult(el("llm-result"), true, "请求中…");
+    el("llm-detail").innerHTML = "";
+    request("/api/panel/test/llm", { method: "POST", body: {} }).then(function (payload) {
+      showResult(el("llm-result"), payload.ok, payload.message);
+      renderDetail(el("llm-detail"), payload.detail);
+    }).catch(function (error) {
+      showResult(el("llm-result"), false, String(error));
+    }).then(function () { button.disabled = false; });
+  });
+
+  el("btn-img").addEventListener("click", function () {
+    var button = el("btn-img");
+    button.disabled = true;
+    showResult(el("img-result"), true, "生成中…");
+    el("img-detail").innerHTML = "";
+    el("img-preview").style.display = "none";
+    request("/api/panel/test/image", {
+      method: "POST",
+      body: { prompt: el("img-prompt").value }
+    }).then(function (payload) {
+      showResult(el("img-result"), payload.ok, payload.message);
+      renderDetail(el("img-detail"), payload.detail);
+      if (payload.ok && payload.image) {
+        var img = el("img-preview");
+        img.src = payload.image + "?t=" + Date.now();
+        img.style.display = "block";
+      }
+    }).catch(function (error) {
+      showResult(el("img-result"), false, String(error));
+    }).then(function () { button.disabled = false; });
+  });
+
+  el("btn-map-smart").addEventListener("click", function () {
+    var male = ["Eldric Sage", "Vincent", "Neil", "Arthur", "Ethan", "Moon", "Kai", "Nofish",
+      "Mochi", "Pip", "Ryan", "Aiden", "Bodega", "Alek", "Dolce", "Lenn", "Emilien",
+      "Andre", "Radio Gol", "Dylan", "Li", "Marcus", "Roy", "Peter", "Eric", "Rocky"];
+    var female = ["Elias", "Seren", "Maia", "Serena", "Cherry", "Chelsie", "Momo", "Vivian",
+      "Bella", "Mia", "Bellona", "Bunny", "Nini", "Stella", "Jennifer", "Katerina",
+      "Sonrisa", "Sohee", "Ono Anna", "Jada", "Sunny", "Kiki"];
+    draftVoices = {};
+    male.forEach(function (name) { draftVoices[name] = "苏打"; });
+    female.forEach(function (name) { draftVoices[name] = "冰糖"; });
+    voiceDirty = true;
+    renderVoices();
+    toast("已按性别填充，记得点保存", "ok");
+  });
+
+  el("btn-map-clear").addEventListener("click", function () {
+    draftVoices = {};
+    state.ocv_voices.forEach(function (row) { draftVoices[row.value] = ""; });
+    voiceDirty = true;
+    renderVoices();
+    toast("已清空映射，记得点保存", "ok");
+  });
+
+  el("btn-open-ocv").addEventListener("click", function () {
+    window.open("http://127.0.0.1:5173", "_blank");
+  });
+/* SPDX-License-Identifier: AGPL-3.0-only */
+/* ===========================================================================
+   云端 OAuth 分页的前端逻辑（纯 DOM，无框架、无构建）。
+
+   由 `dev_patch_panel_html.py` 注入到 index.html 的面板 IIFE 内部
+   —— 因此可以直接用该 IIFE 里的 `el / h / request / toast / drafts / state /
+   loadAllModels`，不需要额外接线。
+
+   设计要点（对齐原 Jet Hub 面板）：
+     * **视觉 99% 在 CSS、交互状态 100% 通过 `data-*` 暴露** —— 所以本文件
+       只负责把状态属性写对（`data-enabled / data-tone / data-disabled /
+       aria-selected / checked`），样式表原样工作。
+     * **能力门控是不渲染，不是渲染后禁用** —— 不支持的提供商连请求都不发
+       （原版 `credits-capabilities.js:9-14` 记录了真实事故）。
+     * **一键签到串行** —— 桥侧 `for...await`，前端不做任何并发优化。
+   =========================================================================== */
+
+var jethubState = null;
+var jethubLoginTimer = null;
+var jethubProvider = "";
+var jethubBusy = false;
+var jethubPendingFile = null;
+
+/**
+ * 统一解包。后端 `_panel_call` 的约定是：
+ *   * handler 返回**含 `ok` 的 dict** → **原样下发**（不包 `data`）；
+ *   * 否则 → 包成 `{ok:true, data:...}`。
+ *
+ * 云端 OAuth 的 handler 一律返回含 `ok` 的扁平 dict，所以拿到的通常就是
+ * payload 本身。用 `payload.data || payload` 兼容两种形态 —— **这个坑真踩过**：
+ * 首版只读 `payload.data`，于是整个分页空白且页面**没有任何报错**，
+ * 只有真浏览器渲染才验得出来（见 docs/JETHUB.md F-003）。
+ */
+function jhUnwrap(payload) {
+  if (!payload) return {};
+  return payload.data || payload;
+}
+
+function jhCall(path, body) {
+  return request(path, { method: "POST", body: body || {} });
+}
+
+function jhNotice(node, tone, message) {
+  if (!node) return;
+  if (!message) { node.style.display = "none"; node.textContent = ""; return; }
+  node.style.display = "";
+  node.setAttribute("data-tone", tone || "");
+  node.textContent = message;
+}
+
+function jhFmtTime(ms) {
+  if (!ms || !isFinite(ms)) return "未知";
+  try { return new Date(ms).toLocaleString(); } catch (e) { return "未知"; }
+}
+
+/** 能力查询：**不支持的按钮直接不渲染**（不是渲染后禁用）。 */
+function jhCapability(id) {
+  var list = (jethubState && jethubState.capabilities) || [];
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].id === id) return list[i];
+  }
+  return { balance: false, checkin: false, onboarding: false };
+}
+
+function renderJetHubProviders() {
+  var rail = el("jethub-providers");
+  if (!rail) return;
+  rail.innerHTML = "";
+  var providers = (jethubState && jethubState.providers) || [];
+  if (!providers.length) {
+    rail.appendChild(h("div", "jh-empty", "（桥未运行）"));
+    return;
+  }
+  providers.forEach(function (provider) {
+    var row = document.createElement("button");
+    row.setAttribute("type", "button");
+    row.setAttribute("aria-selected", provider.id === jethubProvider ? "true" : "false");
+    row.appendChild(h("span", "jh-dot"));
+    row.appendChild(h("span", null, provider.label || provider.id));
+    row.addEventListener("click", function () {
+      if (jethubProvider === provider.id) return;
+      jethubProvider = provider.id;
+      // 记住选择：写进面板草稿，点「保存」即持久化到 JETHUB_PROVIDER
+      drafts.JETHUB_PROVIDER = provider.id;
+      renderJetHubProviders();
+      refreshJetHub();
+    });
+    rail.appendChild(row);
+  });
+}
+
+function renderJetHubBridge() {
+  var box = el("jethub-bridge");
+  if (!box) return;
+  box.innerHTML = "";
+  var bridge = (jethubState && jethubState.bridge) || {};
+  var rows = [
+    ["开关", jethubState && jethubState.enabled ? "已启用" : "已关闭"],
+    ["桥", bridge.listening
+      ? ("运行中（端口 " + bridge.port + "，PID " + ((bridge.health || {}).pid || "?") + "）")
+      : "未运行"],
+    ["Node", bridge.node_found ? bridge.node : "未找到（既无 runtime/node，PATH 里也没有 node）"],
+    ["提供商", jethubProvider || "（未选择）"],
+    ["状态目录", (jethubState && jethubState.storage || {}).state_dir || ""]
+  ];
+  rows.forEach(function (row) {
+    box.appendChild(h("dt", null, row[0]));
+    box.appendChild(h("dd", null, String(row[1])));
+  });
+  if (jethubState && jethubState.message) {
+    jhNotice(el("jethub-login-hint"), "warn", jethubState.message);
+  }
+  if (bridge.listening && (jethubState.storage || {}).poolInPlugin === false) {
+    jhNotice(el("jethub-login-hint"), "err", "⚠ 账号池不在插件目录内，请检查配置");
+  }
+}
+
+function renderJetHubAccounts() {
+  var box = el("jethub-accounts");
+  if (!box) return;
+  box.innerHTML = "";
+  if (!jethubState) return;
+  if (jethubState.accounts_error) {
+    box.appendChild(h("div", "jh-notice", "读取账号失败：" + jethubState.accounts_error));
+    return;
+  }
+  var accounts = jethubState.accounts || [];
+  if (!accounts.length) {
+    box.appendChild(h("div", "jh-empty",
+      "这个提供商下还没有账号。点「新增账号」，会在浏览器里打开登录窗口。"));
+    return;
+  }
+  var cap = jhCapability(jethubProvider);
+  // 余额按 accountId 索引（桥逐账号返回，三态：ok / error / 未返回=读取中）
+  var balanceMap = {};
+  var balances = (jethubState.balances || {}).accounts || [];
+  balances.forEach(function (row) { balanceMap[row.accountId] = row; });
+
+  accounts.forEach(function (account) {
+    var card = h("div", "jh-card");
+    card.setAttribute("data-enabled", account.enabled ? "true" : "false");
+
+    var top = h("div", "jh-cardTop");
+    top.appendChild(h("span", "jh-status"));
+    top.appendChild(h("span", "jh-name", account.nickname || account.id));
+    var tag = h("span", "jh-tag", account.enabled ? "启用" : "停用");
+    tag.setAttribute("data-tone", account.enabled ? "on" : "off");
+    top.appendChild(tag);
+    if (account.refreshable === false) {
+      var noRefresh = h("span", "jh-tag", "不可续期");
+      noRefresh.setAttribute("data-tone", "warn");
+      top.appendChild(noRefresh);
+    }
+    card.appendChild(top);
+
+    var meta = document.createElement("dl");
+    meta.className = "jh-meta";
+    meta.appendChild(h("dt", null, "凭据"));
+    meta.appendChild(h("dd", null, account.id));
+    meta.appendChild(h("dt", null, "有效期"));
+    var expired = account.expiresAt && account.expiresAt < Date.now();
+    var expiresText = jhFmtTime(account.expiresAt);
+    meta.appendChild(h("dd", null, expired ? (expiresText + "（已过期）") : expiresText));
+
+    if (cap.balance) {
+      meta.appendChild(h("dt", null, "积分"));
+      var dd = document.createElement("dd");
+      var row = balanceMap[account.id];
+      if (!row) {
+        // **查不到 ≠ 0** —— 明确显示「读取中」而不是 0
+        var pending = h("span", "jh-credit", "读取中…");
+        pending.setAttribute("data-tone", "muted");
+        dd.appendChild(pending);
+      } else if (row.status !== "ok") {
+        var fail = h("span", "jh-credit", "查询失败");
+        fail.setAttribute("data-tone", "warn");
+        fail.title = row.message || "";
+        dd.appendChild(fail);
+      } else {
+        var value = row.balance || {};
+        dd.appendChild(h("span", "jh-credit", value.label || "—"));
+        // Loomy 的「永久 / 每日」两池。
+        // ⚠ 字段名是 `packages`（vendor `loomy-credits.js:136-144` 返回
+        // `{total, packages:[makePackage('永久积分',…), makePackage('每日赠送',…)]}`），
+        // 不是 `pools`；而且**元素是对象**、金额在 `remaining` 里。
+        // 首版读 `raw.pools` 且当数字用 → 这段**静默永不显示**。
+        var packs = value.raw && value.raw.packages;
+        if (Array.isArray(packs) && packs.length === 2) {
+          var first = packs[0] || {};
+          var second = packs[1] || {};
+          var a = first.remaining !== undefined ? first.remaining : first.total;
+          var b = second.remaining !== undefined ? second.remaining : second.total;
+          if (a !== undefined || b !== undefined) {
+            dd.appendChild(h("span", "jh-creditExtra",
+              (first.name || "永久") + " " + (a === undefined ? "—" : a)
+              + " · " + (second.name || "每日") + " " + (b === undefined ? "—" : b)));
+          }
+        }
+        // 另有已失效额度时一并提示（同样来自 vendor 的 expiredTotal）
+        var expiredTotal = value.raw && value.raw.expiredTotal;
+        if (typeof expiredTotal === "number" && expiredTotal > 0) {
+          dd.appendChild(h("span", "jh-creditExtra", "另有 " + expiredTotal + " 已失效"));
+        }
+      }
+      meta.appendChild(dd);
+    }
+    card.appendChild(meta);
+
+    var actions = h("div", "jh-actions");
+
+    var toggle = h("button", "jh-btn", account.enabled ? "停用" : "启用");
+    toggle.setAttribute("type", "button");
+    toggle.addEventListener("click", function () {
+      jhAccountAction("toggle", account.id, { enabled: !account.enabled });
+    });
+    actions.appendChild(toggle);
+
+    // ⚠ 「刷新凭据」按钮**已移除**（用户要求）。
+    //
+    // 凭据刷新是**后台自动**的：桥在每次调用前走
+    // `resolveUsableCredential()` —— 发现凭据过期（或即将过期，留 60 秒余量）
+    // 就按账号自己的 credentialRef 主动刷新，再发请求。
+    // 这与参考项目的行为一致：**用户不需要、也不应该手动刷**。
+    // 手动按钮只会让人误以为「不点就不会刷新」。
+    //
+    // 账号卡上仍保留 `refreshable` 这一行信息（只读展示），
+    // 让人知道这个账号的凭据是可以自动续期的。
+
+    if (cap.onboarding) {
+      var onboarding = h("button", "jh-btn", "领新手任务");
+      onboarding.setAttribute("type", "button");
+      onboarding.addEventListener("click", function () {
+        onboarding.disabled = true;
+        jhCall("/api/panel/jethub/credits",
+          { action: "claimOnboarding", provider: jethubProvider }).then(function (payload) {
+          onboarding.disabled = false;
+          jhNotice(el("jethub-checkin-result"), payload.ok ? "ok" : "err",
+            jhUnwrap(payload).message || payload.message || "");
+          refreshJetHub();
+        });
+      });
+      actions.appendChild(onboarding);
+    }
+
+    var remove = h("button", "jh-btn", "删除");
+    remove.setAttribute("type", "button");
+    remove.setAttribute("data-kind", "danger");
+    remove.addEventListener("click", function () {
+      if (!window.confirm("删除账号 " + (account.nickname || account.id)
+          + "？其凭据也会一并删除。")) return;
+      jhAccountAction("remove", account.id);
+    });
+    actions.appendChild(remove);
+
+    card.appendChild(actions);
+    box.appendChild(card);
+  });
+}
+
+function jhAccountAction(action, accountId, extra, done) {
+  var body = { action: action, account_id: accountId, provider: jethubProvider };
+  if (extra) {
+    for (var key in extra) {
+      if (Object.prototype.hasOwnProperty.call(extra, key)) body[key] = extra[key];
+    }
+  }
+  jhCall("/api/panel/jethub/account", body).then(function (payload) {
+    if (done) done();
+    if (!payload.ok) { toast(payload.message || "操作失败", "err"); return; }
+    jethubState.accounts = jhUnwrap(payload).accounts || [];
+    renderJetHubAccounts();
+    toast("已更新", "ok");
+  });
+}
+
+function renderJetHubModels() {
+  var box = el("jethub-models");
+  if (!box) return;
+  box.innerHTML = "";
+  if (!jethubState) return;
+  if (jethubState.models_error) {
+    box.appendChild(h("div", "jh-notice", "读取模型失败：" + jethubState.models_error));
+    return;
+  }
+  var models = jethubState.models || [];
+  // 记进缓存，供「当前选用模型」的可用性校验使用
+  jhCacheModels(jethubProvider, models);
+  if (!models.length) {
+    box.appendChild(h("div", "jh-empty", "没有可用模型。先登录账号，再点「刷新模型」。"));
+    return;
+  }
+  var disabledCount = 0;
+  models.forEach(function (model) {
+    if (model.disabled) disabledCount += 1;
+    var row = h("div", "jh-modelRow");
+    row.setAttribute("data-disabled", model.disabled ? "true" : "false");
+    var info = h("div", "jh-modelInfo");
+    info.appendChild(h("span", "jh-modelName", model.name || model.id));
+    info.appendChild(h("span", "jh-modelId", model.id));
+    row.appendChild(info);
+
+    var toggle = document.createElement("input");
+    toggle.type = "checkbox";
+    toggle.className = "jh-switch";
+    toggle.setAttribute("role", "switch");
+    toggle.checked = !model.disabled;
+    toggle.disabled = jethubBusy;
+    toggle.addEventListener("change", function () {
+      toggle.disabled = true;
+      jhCall("/api/panel/jethub/model/toggle",
+        { provider: jethubProvider, model_id: model.id, disabled: !toggle.checked })
+        .then(function (payload) {
+          if (!payload.ok) {
+            toast(payload.message || "失败", "err");
+            toggle.checked = !toggle.checked;
+            toggle.disabled = false;
+            return;
+          }
+          jethubState.models = jhUnwrap(payload).models || [];
+          renderJetHubModels();
+          toast("已更新模型显示列表", "ok");
+          loadAllModels();
+        });
+    });
+    row.appendChild(toggle);
+    box.appendChild(row);
+  });
+  // 计数：一眼看出关掉了几个（黑名单制的可见性）
+  box.insertBefore(
+    h("div", "jh-empty", "共 " + models.length + " 个模型，已关闭 " + disabledCount + " 个。"),
+    box.firstChild);
+}
+
+function renderJetHub() {
+  if (!jethubState) return;
+  if (!jethubProvider) {
+    jethubProvider = jethubState.provider
+      || drafts.JETHUB_PROVIDER
+      || ((jethubState.providers || [])[0] || {}).id
+      || "buddy";
+  }
+  renderJetHubProviders();
+  renderJetHubBridge();
+  renderJetHubAccounts();
+  renderJetHubModels();
+
+  // 能力门控：不支持的按钮**直接隐藏**
+  var cap = jhCapability(jethubProvider);
+  var balanceBtn = el("btn-jethub-balances");
+  if (balanceBtn) balanceBtn.style.display = cap.balance ? "" : "none";
+  var checkinBtn = el("btn-jethub-checkin");
+  if (checkinBtn) checkinBtn.style.display = cap.checkin ? "" : "none";
+}
+
+function refreshJetHub() {
+  return jhCall("/api/panel/jethub/status", { provider: jethubProvider })
+    .then(function (payload) {
+      if (!payload.ok) {
+        toast(payload.message || "读取云端 OAuth 状态失败", "err");
+        return;
+      }
+      jethubState = jhUnwrap(payload);
+      if (jethubState.provider) jethubProvider = jethubProvider || jethubState.provider;
+      renderJetHub();
+    });
+}
+
+function jhBind(id, handler) {
+  var node = el(id);
+  if (node) node.addEventListener("click", handler);
+}
+
+jhBind("btn-jethub-refresh", function () {
+  refreshJetHub().then(function () { toast("已刷新", "ok"); });
+});
+
+jhBind("btn-jethub-ensure", function () {
+  toast("正在启动桥…");
+  jhCall("/api/panel/jethub/ensure", { restart: true }).then(function (payload) {
+    if (!payload.ok) { toast(payload.message || "启动失败", "err"); return; }
+    jethubState = jhUnwrap(payload);
+    renderJetHub();
+    toast("桥已就绪", "ok");
+    loadAllModels();
+  });
+});
+
+jhBind("btn-jethub-stop", function () {
+  jhCall("/api/panel/jethub/stop", {}).then(function (payload) {
+    toast(jhUnwrap(payload).message || payload.message || "已停止", payload.ok ? "ok" : "err");
+    refreshJetHub();
+  });
+});
+
+/* 两步式登录：先拿 URL **立刻** window.open（保住浏览器手势），再轮询结果。
+   绝不能在 await 完整个登录流程后才开窗 —— 那时手势已过期，弹窗被拦。 */
+jhBind("btn-jethub-login", function () {
+  var nickname = (el("jethub-nickname") || {}).value || "";
+  var hint = el("jethub-login-hint");
+  jhNotice(hint, "warn", "正在获取登录地址…");
+  jhCall("/api/panel/jethub/login/start",
+    { provider: jethubProvider, nickname: nickname }).then(function (payload) {
+    if (!payload.ok) {
+      jhNotice(hint, "err", payload.message || "启动登录失败");
+      toast(payload.message || "启动登录失败", "err");
+      return;
+    }
+    var data = jhUnwrap(payload);
+    if (data.login_url) {
+      var opened = window.open(data.login_url, "_blank", "width=900,height=700");
+      if (!opened) {
+        // 弹窗被拦：显示地址让用户手工点，**绝不** location.href 跳转
+        hint.style.display = "";
+        hint.setAttribute("data-tone", "warn");
+        hint.innerHTML = "弹窗被拦截，请手工打开：<a href=\"" + data.login_url
+          + "\" target=\"_blank\" rel=\"noreferrer\">" + data.login_url + "</a>";
+      } else {
+        jhNotice(hint, "warn", data.note || "已打开登录窗口，请在浏览器里完成授权…");
+      }
+    } else {
+      jhNotice(hint, "warn", data.note || "该提供商的登录在后台进行，请稍候…");
+    }
+    toast("请在浏览器里完成授权", "ok");
+    pollJethubLogin(data.account_id, jethubProvider, nickname);
+  });
+});
+
+function pollJethubLogin(accountId, provider, nickname) {
+  if (jethubLoginTimer) clearInterval(jethubLoginTimer);
+  var hint = el("jethub-login-hint");
+  var tries = 0;
+  jethubLoginTimer = setInterval(function () {
+    tries += 1;
+    if (tries > 300) {  // 5 分钟（1 秒一次）
+      clearInterval(jethubLoginTimer);
+      jethubLoginTimer = null;
+      jhNotice(hint, "err", "登录超时，请重试。");
+      return;
+    }
+    jhCall("/api/panel/jethub/login/poll",
+      { account_id: accountId, provider: provider }).then(function (payload) {
+      if (!payload.ok) return;  // 单次失败不中断轮询
+      var data = jhUnwrap(payload);
+      if (data.message) jhNotice(hint, "warn", data.message);
+      if (!data.done) return;
+      clearInterval(jethubLoginTimer);
+      jethubLoginTimer = null;
+      if (data.success) {
+        toast("登录成功，账号已加入", "ok");
+        if (el("jethub-nickname")) el("jethub-nickname").value = "";
+        jhNotice(hint, "ok", "登录成功。");
+        setTimeout(function () { jhNotice(hint, "", ""); }, 4000);
+        refreshJetHub().then(function () { loadAllModels(); });
+      } else {
+        jhNotice(hint, "err", data.message || "登录失败");
+      }
+    });
+  }, 1000);
+}
+
+jhBind("btn-jethub-balances", function () {
+  var btn = el("btn-jethub-balances");
+  btn.disabled = true;
+  jhCall("/api/panel/jethub/credits", { action: "balances", provider: jethubProvider })
+    .then(function (payload) {
+      btn.disabled = false;
+      if (!payload.ok) { toast(payload.message || "查询失败", "err"); return; }
+      if (!jethubState) jethubState = {};
+      jethubState.balances = jhUnwrap(payload);
+      renderJetHubAccounts();
+      toast("积分已刷新", "ok");
+    });
+});
+
+/* 一键签到：桥侧**串行**执行（跨渠道并发会触发风控，见 docs/JETHUB.md） */
+jhBind("btn-jethub-checkin", function () {
+  var btn = el("btn-jethub-checkin");
+  var box = el("jethub-checkin-result");
+  btn.disabled = true;
+  jhNotice(box, "warn", "正在逐家签到（串行执行，可能耗时较久）…");
+  jhCall("/api/panel/jethub/credits", { action: "claimAll" }).then(function (payload) {
+    btn.disabled = false;
+    if (!payload.ok) { jhNotice(box, "err", payload.message || "签到失败"); return; }
+    var data = jhUnwrap(payload);
+    jhNotice(box, data.total_failed > 0 ? "warn" : "ok", data.message || "签到完成");
+    // 失败明细：**每个非零计数都要出现**（不用 else-if 短路）
+    var failed = (data.results || []).filter(function (r) { return r.failed > 0; });
+    if (failed.length) {
+      var ul = document.createElement("ul");
+      failed.forEach(function (r) {
+        (r.messages || []).slice(0, 6).forEach(function (msg) {
+          ul.appendChild(h("li", null, (r.label || r.provider) + "：" + msg));
+        });
+      });
+      box.appendChild(ul);
+    }
+    refreshJetHub();
+  });
+});
+
+jhBind("btn-jethub-models", function () {
+  refreshJetHub().then(function () {
+    toast("已刷新模型清单", "ok");
+    loadAllModels();
+  });
+});
+
+function jhBulkModels(disabled) {
+  var label = disabled ? "关闭全部" : "打开全部";
+  // 关闭全部是**批量写**（逐项加黑名单），二次确认
+  if (disabled && !window.confirm("关闭全部模型？它们会从 OCV 的模型下拉里消失。")) return;
+  jethubBusy = true;
+  renderJetHubModels();
+  toast(label + "中…");
+  request("/api/panel/jethub/models/all",
+    { method: "POST", body: { provider: jethubProvider, disabled: disabled } })
+    .then(function (payload) {
+      jethubBusy = false;
+      if (!payload.ok) { toast(payload.message || "失败", "err"); refreshJetHub(); return; }
+      jethubState.models = jhUnwrap(payload).models || [];
+      renderJetHubModels();
+      toast(label + "完成", "ok");
+      loadAllModels();
+    });
+}
+
+jhBind("btn-jethub-models-all-on", function () { jhBulkModels(false); });
+jhBind("btn-jethub-models-all-off", function () { jhBulkModels(true); });
+
+jhBind("btn-jethub-test", function () {
+  var box = el("jethub-test-result");
+  jhNotice(box, "warn", "测试中（最长 2 分钟）…");
+  var model = drafts.JETHUB_MODEL
+    || (state && state.values && state.values.JETHUB_MODEL) || "";
+  jhCall("/api/panel/jethub/test", { model: model, provider: jethubProvider })
+    .then(function (payload) {
+      var data = jhUnwrap(payload);
+      if (!payload.ok) {
+        jhNotice(box, "err", payload.message || data.message || "测试失败");
+        return;
+      }
+      jhNotice(box, data.ok ? "ok" : "err", data.message || "");
+    });
+});
+
+/* ==================== 备份 / 恢复（本地上传，直接展开在面板中） ====================
+   用户要求两件事，这里都落实：
+
+   1. **不要另外弹窗** —— 备份与恢复各自成为一张常驻卡片，直接在页面里操作，
+      不再有 modal（原先那个 `jh-backup-modal` 已删除）。
+   2. **点「选择文件」要真的跳出系统文件选择框** —— 这一点原先**是坏的**：
+      modal 被插在**脚本结束标签之后**，而 `jhBind()` 在脚本执行时就跑完了，
+      绑定那一刻元素还不存在 → 静默跳过 → 按钮点了没反应。
+      现在元素就在本卡片内、且**先于脚本**出现，绑定必然成功。
+
+   （注意：本文件是注入到 script 元素内部的，所以**任何地方都不能出现
+   script 元素的标签文本** —— 连注释里也不行，那会提前关闭脚本块。
+   本次开发在这个坑上连踩三次，见 docs/JETHUB.md F-004。）
+
+   为稳妥起见，这里的绑定走 `jhBindWhenReady()`：元素已存在就立刻绑，
+   否则等一小段（最多若干次）—— 这样无论将来卡片被移到哪里都不会再静默失效。 */
+
+function jhBackupExport(saveServer) {
+  jhCall("/api/panel/jethub/backup", { action: "export", save_server: !!saveServer })
+    .then(function (payload) {
+      if (!payload.ok) { toast(payload.message || "导出失败", "err"); return; }
+      var data = jhUnwrap(payload);
+      if (data.document) {
+        // Blob + <a download> 触发「保存到本地」—— 用户自己挑存哪
+        var blob = new Blob([JSON.stringify(data.document, null, 2)],
+          { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = data.name || "cloud-oauth-backup.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 5000);
+        toast(data.message || "备份已下载到本地", "ok");
+      } else {
+        toast(data.message || "已留档", "ok");
+        refreshJetHub();
+      }
+    });
+}
+
+function jhBackupImport(file) {
+  if (!file) return;
+  var mode = window.confirm(
+    "恢复模式：\n\n【确定】= 合并（同名覆盖、其余保留）\n【取消】= 替换（先清空再写入）")
+    ? "merge" : "replace";
+  if (mode === "replace" && !window.confirm("替换会先清空现有账号与凭据，确定继续？")) return;
+  var reader = new FileReader();
+  reader.onload = function () {
+    jhCall("/api/panel/jethub/backup", {
+      action: "import",
+      document: String(reader.result || ""),
+      file_name: file.name,
+      mode: mode
+    }).then(function (payload) {
+      if (!payload.ok) { toast(payload.message || "恢复失败", "err"); return; }
+      toast(jhUnwrap(payload).message || "已恢复", "ok");
+      refreshJetHub();
+    });
+  };
+  reader.onerror = function () { toast("读取文件失败", "err"); };
+  reader.readAsText(file);
+}
+
+/**
+ * 元素就绪后再绑定（幂等，最多等 ~6 秒）。
+ *
+ * 存在的理由见上面注释：原先因为 modal 排在脚本之后，`jhBind` 静默失效，
+ * 用户点「选择文件」毫无反应。这个包装让「绑定时机」不再依赖
+ * 「元素恰好写在脚本前面」这种脆弱假设。
+ */
+function jhBindWhenReady(id, handler, triesLeft) {
+  var node = el(id);
+  if (node) {
+    if (node.__jhBoundHandler === handler) return;
+    node.__jhBoundHandler = handler;
+    node.addEventListener("click", handler);
+    return;
+  }
+  var left = triesLeft === undefined ? 30 : triesLeft;
+  if (left <= 0) return;
+  setTimeout(function () { jhBindWhenReady(id, handler, left - 1); }, 200);
+}
+
+jhBindWhenReady("btn-jh-backup-export-download", function () { jhBackupExport(false); });
+jhBindWhenReady("btn-jh-backup-export-server", function () { jhBackupExport(true); });
+
+/* 「选择备份文件」：唤起隐藏的 <input type=file>。
+   注意必须先 `value = ""` 再 `click()` —— 否则连续选**同一个文件**时
+   change 事件不会触发（浏览器认为值没变），用户会以为按钮坏了。 */
+jhBindWhenReady("btn-jh-backup-pick", function () {
+  var input = el("jh-backup-file");
+  if (!input) { toast("找不到文件选择控件", "err"); return; }
+  input.value = "";
+  input.click();
+});
+
+jhBindWhenReady("btn-jh-backup-import", function () {
+  if (!jethubPendingFile) { toast("请先点「选择备份文件…」挑一个备份", "err"); return; }
+  jhBackupImport(jethubPendingFile);
+});
+
+/* file input 的 change：记住选中的文件并回显文件名 */
+(function () {
+  // ⚠ 重试必须**有上限**（F-014：首版是无上限的 setTimeout 递归）。
+  // 若元素因某种原因始终不存在，无上限重试会让定时器永久驻留。
+  function bindInput(triesLeft) {
+    var input = el("jh-backup-file");
+    if (!input) {
+      if (triesLeft > 0) setTimeout(function () { bindInput(triesLeft - 1); }, 200);
+      return;
+    }
+    if (input.__jhBoundChange) return;
+    input.__jhBoundChange = true;
+    input.addEventListener("change", function () {
+      var file = input.files && input.files[0];
+      jethubPendingFile = file || null;
+      var label = el("jh-backup-filename");
+      if (label) {
+        label.textContent = file ? file.name : "（未选择文件）";
+        label.setAttribute("data-picked", file ? "true" : "false");
+      }
+      if (file) toast("已选择：" + file.name, "ok");
+    });
+  }
+  bindInput(30);
+})();
+
+
+/* ==================== 语言模型来源：互斥可见性 ====================
+   用户要求：「语言模型和云端 OAuth 两项都是 LLM，不能同时使用，
+   在语言模型中给用户下拉选择」；「云端 OAuth 页只用于配置账号，
+   不用于选择具体用哪个模型」。
+
+   所以：
+     * 来源下拉（LLM_SOURCE）永远可见；
+     * 标了 `source: "custom"` 的字段只在选「自行填写 API」时显示；
+     * 标了 `source: "jethub"` 的字段只在选「云端 OAuth」时显示；
+     * 没标 `source` 的字段（深度思考、重试、Agent 1B…）两路通用，始终显示。
+
+   实现靠给字段外层 `div.field` 打 **`data-source` 属性** —— 这样
+   **不必逐个记住字段名**：后端加字段时只要写上 `source` 就自动生效。
+   属性由下面这段在渲染后统一补（`buildField` 是既有代码，不动它）。 */
+
+function jhCurrentSource() {
+  var node = document.querySelector('[data-key="LLM_SOURCE"]');
+  if (node && node.value) return node.value;
+  if (drafts.LLM_SOURCE) return drafts.LLM_SOURCE;
+  if (state && state.values && state.values.LLM_SOURCE) return state.values.LLM_SOURCE;
+  if (state && state.llm_source) return state.llm_source;
+  return "custom";
+}
+
+/** 给每个字段外层打上 data-source（幂等）。 */
+function jhTagFieldSources() {
+  if (!state || !state.fields) return;
+  state.fields.forEach(function (field) {
+    if (!field.source) return;
+    var node = document.querySelector('[data-key="' + field.key + '"]');
+    if (!node) return;
+    var wrap = node.closest(".field") || node.parentElement;
+    // 已在同一个 wrap 上打过同样的值就跳过 —— 避免无谓的 DOM 写入
+    if (wrap && wrap.getAttribute("data-source") !== field.source) {
+      wrap.setAttribute("data-source", field.source);
+    }
+  });
+}
+
+/**
+ * 按 provider 缓存的模型清单（`{buddy: [{id, name, disabled}, …]}`）。
+ *
+ * 用于「当前选用模型」的**可用性校验** —— 光有 `provider::model` 字符串
+ * 看不出这个模型还在不在、有没有被「显示列表」关掉。
+ * 由 `renderJetHubModels()` 与 `jhBulkModels()` 在拿到新清单时刷新。
+ */
+var jethubModelsByProvider = {};
+
+/** 把一次 `models.list` 的结果记进缓存（同时兼容 `{models:[…]}` 与裸数组）。 */
+function jhCacheModels(providerId, models) {
+  if (!providerId) return;
+  if (Array.isArray(models)) {
+    jethubModelsByProvider[String(providerId)] = models;
+  } else if (models && Array.isArray(models.models)) {
+    jethubModelsByProvider[String(providerId)] = models.models;
+  }
+}
+
+/**
+ * 把 `<provider>::<model>` 渲染成人看得懂的一行。
+ *
+ * 值本身是给桥用的（按 `::` 拆分路由），但**用户需要看到「哪家 · 哪个模型」**
+ * —— 用户明确要求「要显示当前选用哪个云端 OAuth 的模型」。
+ *
+ * 顺带校验它**是否还在当前可用清单里**：账号被删了、或该模型被
+ * 「显示列表」关掉了，这里就要明确提示 —— 否则用户只会在调用时遇到
+ * 「还没有任何账号」或「模型不可用」这种指不到根因的报错。
+ */
+var JH_PROVIDER_NAMES = {
+  buddy: "CodeBuddy（腾讯）", workbuddy: "WorkBuddy（腾讯国际版）",
+  lobsterai: "LobsterAI（有道）", qoder: "Qoder（阿里）", trae: "TRAE（字节）",
+  cline: "Cline", loomy: "Loomy（讯飞）", codearts: "CodeArts（华为云）",
+  atomcode: "AtomCode（AtomGit）",
+};
+
+function jhDescribeModel(value) {
+  if (!value) return null;
+  var text = String(value);
+  var idx = text.indexOf("::");
+  if (idx <= 0) {
+    // 手填的裸 model id：没有提供商前缀，桥会用默认提供商兜底
+    return { title: text, note: "未带提供商前缀，将用默认提供商", tone: "warn" };
+  }
+  var providerId = text.slice(0, idx).trim();
+  var modelId = text.slice(idx + 2).trim();
+  var providerLabel = JH_PROVIDER_NAMES[providerId] || providerId;
+  var result = {
+    title: providerLabel + " · " + modelId,
+    note: "",
+    tone: "",
+  };
+  // 在已拉取的清单里核对可用性（清单按 provider 缓存在 jethubModelsByProvider）
+  var rows = (jethubModelsByProvider || {})[providerId];
+  if (Array.isArray(rows) && rows.length > 0) {
+    var hit = null;
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i] && String(rows[i].id) === modelId) { hit = rows[i]; break; }
+    }
+    if (hit === null) {
+      result.note = "不在该提供商的模型清单里（可能已下线）";
+      result.tone = "warn";
+    } else if (hit.disabled) {
+      result.note = "该模型已被「显示列表」关闭，OCV 里选不到它";
+      result.tone = "warn";
+    }
+  }
+  return result;
+}
+
+function jhApplySourceVisibility() {
+  var source = jhCurrentSource();
+  Array.prototype.forEach.call(document.querySelectorAll("[data-source]"), function (row) {
+    var want = row.getAttribute("data-source");
+    // `show` = 当前来源要显示的；`hide` = 不显示
+    // `both` 两路都显示；其余按来源匹配
+    var show = (want === "both" || want === source);
+    row.style.display = show ? "" : "none";
+    // ⚠ **只隐藏，不卸载**：字段的 DOM 保留着，草稿值（drafts）也保留。
+    //   这样「切到云端 OAuth 再切回来」时，之前填的 API Key / 地址 / 模型
+    //   都还在 —— 否则用户会以为配置丢了（那是个更糟的体验）。
+    row.setAttribute("data-hidden-by-source", show ? "false" : "true");
+  });
+
+  var hint = el("llm-source-hint");
+  if (!hint) return;
+  if (source === "jethub") {
+    // 用户要求：「要显示当前选用哪个云端 OAuth 的模型」
+    var current = drafts.JETHUB_MODEL !== undefined
+      ? drafts.JETHUB_MODEL
+      : ((state && state.values && state.values.JETHUB_MODEL) || "");
+    var desc = jhDescribeModel(current);
+    var lines = ['<div><b>当前使用：云端 OAuth</b>（模型来自你已登录的账号）</div>'];
+    if (desc === null) {
+      lines.push('<div class="jh-sourceWarn">⚠ 还没选模型 —— 请在下面「云端 OAuth 模型」里选一个。</div>');
+      hint.setAttribute("data-tone", "warn");
+    } else {
+      lines.push('<div>当前选用模型：<b>' + jhEscape(desc.title) + '</b></div>');
+      if (desc.note) {
+        lines.push('<div class="jh-sourceWarn">⚠ ' + jhEscape(desc.note) + '</div>');
+        hint.setAttribute("data-tone", "warn");
+      } else {
+        hint.setAttribute("data-tone", "ok");
+      }
+    }
+    hint.innerHTML = lines.join("");
+  } else {
+    var m = drafts.SENSENOVA_MODEL !== undefined
+      ? drafts.SENSENOVA_MODEL
+      : ((state && state.values && state.values.SENSENOVA_MODEL) || "");
+    hint.innerHTML = '<div><b>当前使用：自行填写 API</b>'
+      + (m ? '（模型 ' + jhEscape(String(m)) + '）' : '')
+      + ' —— 模型与服务商由下面的字段决定。</div>';
+    hint.setAttribute("data-tone", "");
+  }
+}
+
+/** 极简 HTML 转义（只用于我们把值插入 innerHTML 的场景）。 */
+function jhEscape(text) {
+  return String(text === undefined || text === null ? "" : text)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function jhRefreshSourceUI() {
+  jhTagFieldSources();
+  jhApplySourceVisibility();
+}
+
+/* 来源下拉一变就立刻切换可见性（不必等保存） */
+(function () {
+  function bind() {
+    var node = document.querySelector('[data-key="LLM_SOURCE"]');
+    if (!node || node.__jhBound) return false;
+    node.__jhBound = true;
+    node.addEventListener("change", function () {
+      drafts.LLM_SOURCE = node.value;
+      jhApplySourceVisibility();
+      // 切到云端 OAuth 时顺手拉一次模型清单（用户要求在这一页选模型）
+      if (node.value === "jethub" && typeof loadAllModels === "function") loadAllModels();
+    });
+    return true;
+  }
+
+  // ⚠ 首次绑定可以在有限次轮询内完成，但**重新打标不能停**（F-027）。
+  //
+  // 保存流程是：`save()` → `render()` → `renderGroup()` 执行
+  // `card.innerHTML = ""` 重建整个卡片 —— 我们在 DOM 上打的 `data-source`
+  // **连着被清掉**，于是所有字段都显示出来（界面退回「API Key」形态），
+  // 用户必须关掉再打开面板才恢复。
+  //
+  // 首版靠一个有上限的轮询（`tries > 30` 后 clearInterval）来打标，
+  // 而保存发生在轮询结束之后 → 必然复现。
+  //
+  // 所以：轮询只负责**首次绑定**；打标交给 MutationObserver **长期守着**。
+  //
+  // ⚠ 清理条件必须**无条件**带上限（F-014：写成 `ready && tries > 30`
+  //   的话，元素始终找不到时 interval 会永久驻留）。
+  var tries = 0;
+  var timer = setInterval(function () {
+    var ready = bind();
+    jhRefreshSourceUI();
+    tries += 1;
+    if (tries > 30) clearInterval(timer);
+  }, 400);
+
+  var watchTries = 0;
+  var watcher = setInterval(function () {
+    var card = el("card-llm");
+    if (!card) {
+      if (++watchTries > 30) clearInterval(watcher);
+      return;
+    }
+    if (!card.__jhSourceObserved) {
+      card.__jhSourceObserved = true;
+      // 观察 childList（renderGroup 清空重画）与子树变化；
+      // 回调里同步重打标 + 重算可见性，避免闪烁。
+      var observer = new MutationObserver(function () {
+        jhRefreshSourceUI();
+      });
+      observer.observe(card, { childList: true, subtree: false });
+      card.__jhSourceObserver = observer;
+    }
+    jhRefreshSourceUI();
+    clearInterval(watcher);
+  }, 400);
+})();
+
+/* 把「当前来源」提示条插到语言模型卡片顶部（幂等）。
+   它是纯前端元素，不进 FIELDS —— 因为它不是配置项，只是状态说明。
+
+   ⚠ **必须在每次 renderGroup 之后重建**（F-021 的真实缺陷）：
+   面板的 `renderGroup()` 会执行 `card.innerHTML = ""` 把卡片清空重画，
+   于是插进 `card-llm` 的提示条**每次渲染都被擦掉** —— 实测首次加载后
+   它就消失了（`hintExists: false`）。
+   所以这里的 `ensureHint()` 会被 `MutationObserver` 盯着卡片，
+   被清掉就立刻补回来。 */
+function jhEnsureSourceHint() {
+  var card = el("card-llm");
+  if (!card) return false;
+  if (el("llm-source-hint")) return true;
+  var note = document.createElement("div");
+  note.className = "jh-notice";
+  note.id = "llm-source-hint";
+  card.insertBefore(note, card.firstChild);
+  // 补回来后立刻填内容（否则会短暂空白）
+  jhApplySourceVisibility();
+  return true;
+}
+
+(function () {
+  // 首次：轮询等 card-llm 出现（renderGroup 是异步的）
+  var tries = 0;
+  var timer = setInterval(function () {
+    if (jhEnsureSourceHint()) { clearInterval(timer); jhRefreshSourceUI(); }
+    if (++tries > 30) clearInterval(timer);
+  }, 400);
+
+  // 之后：盯着 card-llm 的子节点变化，被 renderGroup 清空就补回来
+  var watchTries = 0;
+  var watcher = setInterval(function () {
+    var card = el("card-llm");
+    if (!card) { if (++watchTries > 30) clearInterval(watcher); return; }
+    if (!card.__jhObserved) {
+      card.__jhObserved = true;
+      var observer = new MutationObserver(function () {
+        // 同步补回，避免闪烁
+        jhEnsureSourceHint();
+      });
+      observer.observe(card, { childList: true });
+      card.__jhObserver = observer;
+    }
+    jhEnsureSourceHint();
+    clearInterval(watcher);
+  }, 400);
+})();
+
+
+
+
+  // ⚠ 分页列表必须在**拿到 state 之后**才能建 —— 它由后端的 `state.groups` 驱动。
+  //   首版把这个 IIFE 放在脚本末尾（此时 state 还是 null），
+  //   浏览器直接抛 `TypeError: Cannot read properties of null (reading 'groups')`，
+  //   整个面板的 tab 一个都渲染不出来。`verify_panel_render.py` 的无头渲染抓到了它。
+  //   现在它是个函数，由 render() 在 state 就绪后调用。
+  function renderTabs() {
+    var FIXED_TABS = { voice: "音色映射" };
+    var tabs = [];
+    ((state && state.groups) || []).forEach(function (group) {
+      tabs.push([group.key, group.label]);
+      if (FIXED_TABS[group.key]) tabs.push([group.key + "-extra", FIXED_TABS[group.key]]);
+    });
+    if (!tabs.length) {
+      tabs = [["mimo", "MiMo 配音"], ["llm", "语言模型（OpenAI 兼容）"],
+              ["image", "图片模型（商汤）"], ["misc", "运行状态"]];
+    }
+    var nav = el("tabs");
+    nav.innerHTML = "";
+    tabs.forEach(function (tab, index) {
+      var button = document.createElement("button");
+      button.textContent = tab[1];
+      if (index === 0) button.className = "active";
+      button.addEventListener("click", function () {
+        Array.prototype.forEach.call(nav.children, function (node) { node.className = ""; });
+        button.className = "active";
+        tabs.forEach(function (item) {
+          var node = el("tab-" + item[0]);
+          if (node) node.className = item[0] === tab[0] ? "active" : "";
+        });
+      });
+      nav.appendChild(button);
+    });
+    // 默认显示第一个分页，其余隐藏（重建 nav 后需要重新对齐可见性）
+    tabs.forEach(function (item, index) {
+      var node = el("tab-" + item[0]);
+      if (node) node.className = index === 0 ? "active" : "";
+    });
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>

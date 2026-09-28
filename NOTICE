@@ -1,0 +1,35 @@
+OCV Cloud Free Stack (OCV 全云端免费栈 / cloud_free_stack)
+
+Copyright (C) 2026 OCV Cloud Free Stack contributors
+
+This plugin is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, version 3 only (AGPL-3.0-only).
+
+This plugin is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+details.
+
+This plugin is an independent extension for One-Click VidGen (OCV / 一键成片).
+It hooks the OCV runtime locally and does not modify or redistribute OCV
+source code.
+
+One-Click VidGen (OCV / 一键成片) is Copyright (C) 2026 Zhou Ruoyu (周若雨)
+and He Yun (何允). Official source repository:
+https://github.com/IFRIT-Zhou/One-Click-VidGen
+
+The AGPL-3.0-only license grants no rights to use the One-Click VidGen, OCV,
+一键成片, or 润物工坊 names, logos, or other brand identifiers of the OCV
+project. See TRADEMARKS.md.
+
+The "Cloud OAuth" (jethub) component is adapted from deepseek-harness-codearts
+(MIT License, Copyright (c) 2026 Jet):
+https://gitee.com/iJetLi/deepseek-harness-codearts
+
+Third-party components and online services remain subject to their respective
+licenses and terms. See THIRD_PARTY_NOTICES.md.
+
+This repository and its release packages never contain API keys, account
+tokens, or user data. Runtime credentials live only in the local, git-ignored
+var/ and state/ directories on each user's own machine.

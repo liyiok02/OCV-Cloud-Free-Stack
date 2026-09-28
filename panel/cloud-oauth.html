@@ -1,0 +1,96 @@
+  <section id="tab-jethub">
+    <!-- JETHUB_* 开关字段由 renderGroup 渲染到这里 -->
+    <div class="card" id="card-jethub"></div>
+
+    <div class="card">
+      <div class="label-row">
+        <label>桥运行状态</label>
+        <span class="sub">本机 Node 桥，供 OCV 当 OpenAI 兼容服务商使用</span>
+      </div>
+      <dl class="jh-kv" id="jethub-bridge"></dl>
+      <div class="jh-actions" style="margin-top:10px">
+        <button class="jh-btn" data-kind="primary" id="btn-jethub-ensure">启动 / 重启桥</button>
+        <button class="jh-btn" id="btn-jethub-stop">停止桥</button>
+        <button class="jh-btn" id="btn-jethub-refresh">刷新状态</button>
+      </div>
+      <div class="jh-notice" id="jethub-login-hint" style="display:none"></div>
+    </div>
+
+    <div class="card">
+      <div class="label-row">
+        <label>账号</label>
+        <span class="sub">多账号：额度耗尽时自动轮换</span>
+      </div>
+      <div class="jh-layout">
+        <!-- 左栏：提供商。**这是唯一的提供商选择入口** ——
+             原先顶部字段卡里还有一个「提供商」下拉，与它重复，已删除
+             （用户要求：有下面这个账号管理窗口就不需要上面的提供商选择了）。 -->
+        <nav class="jh-rail" id="jethub-providers" aria-label="提供商"></nav>
+        <div class="jh-main">
+          <div class="jh-actions" style="margin-bottom:10px">
+            <input class="input" id="jethub-nickname" placeholder="备注名（可留空）"
+                   style="flex:1;min-width:110px;font-size:12px;padding:4px 8px">
+            <button class="jh-btn" data-kind="primary" id="btn-jethub-login">新增账号</button>
+            <button class="jh-btn" id="btn-jethub-balances">刷新积分</button>
+            <button class="jh-btn" data-kind="primary" id="btn-jethub-checkin">一键签到</button>
+          </div>
+          <div class="jh-notice" id="jethub-checkin-result" style="display:none"></div>
+          <div id="jethub-accounts"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label-row">
+        <label>模型显示列表</label>
+        <span class="sub">黑名单制：关掉的不出现在 OCV 的模型下拉里</span>
+      </div>
+      <div class="jh-bulkBar">
+        <button class="jh-btn" id="btn-jethub-models">刷新模型</button>
+        <button class="jh-btn" id="btn-jethub-models-all-on">打开全部</button>
+        <button class="jh-btn" id="btn-jethub-models-all-off">关闭全部</button>
+        <button class="jh-btn" id="btn-jethub-test">对话测试</button>
+      </div>
+      <div class="jh-notice" id="jethub-test-result" style="display:none"></div>
+      <div id="jethub-models"></div>
+    </div>
+
+    <!-- 备份 / 恢复：**直接展开在本页**，不再弹窗
+         （用户要求：不要另外弹窗，分开放在面板中） -->
+    <div class="card">
+      <div class="label-row">
+        <label>备份</label>
+        <span class="sub">导出全部提供商的账号与凭据</span>
+      </div>
+      <div class="jh-notice" data-tone="warn" style="margin-top:0">
+        备份文件<b>含凭据明文</b>。请只保存在自己信任的位置；如需跨机器传输，请自行加密。
+      </div>
+      <div class="jh-actions">
+        <button class="jh-btn" data-kind="primary" type="button"
+                id="btn-jh-backup-export-download">下载到本地</button>
+        <button class="jh-btn" type="button" id="btn-jh-backup-export-server">留档到插件目录</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label-row">
+        <label>恢复</label>
+        <span class="sub">从本地上传备份文件</span>
+      </div>
+      <div class="jh-actions">
+        <button class="jh-btn" data-kind="primary" type="button" id="btn-jh-backup-pick">
+          选择备份文件…
+        </button>
+        <span class="jh-fileName" id="jh-backup-filename">（未选择文件）</span>
+      </div>
+      <!-- 隐藏的真实 file input，由上面的按钮 click() 唤起系统文件选择框 -->
+      <input type="file" id="jh-backup-file" accept=".json,application/json" style="display:none">
+      <div class="jh-actions" style="margin-top:8px">
+        <button class="jh-btn" type="button" id="btn-jh-backup-import">开始恢复</button>
+      </div>
+      <div class="jh-notice" style="margin-bottom:0">
+        恢复时可选<b>合并</b>（同名覆盖、其余保留）或<b>替换</b>（先清空）——
+        在弹出的确认框里选「确定」= 合并，「取消」= 替换。
+      </div>
+    </div>
+  </section>

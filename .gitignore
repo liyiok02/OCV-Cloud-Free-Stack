@@ -1,0 +1,29 @@
+# ===== 永不入库：运行期数据（API Key / OAuth 凭据 / 生成媒体 / 日志） =====
+var/
+state/
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# 日志与本地归档
+*.log
+*.zip
+*.tmp
+*.user-backup
+
+# 系统 / 编辑器
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# 内部开发文档：只留在维护者本地，不入库、不打包
+/docs/DEVLOG.md
+/docs/JETHUB-移植侦察报告.md
+
+# 注意：vendor/（含 vendor/node_modules/）是刻意提交的依赖闭包，
+# 由 vendor_tool.py 在开发机再生与校验，目标机无需 DSH/npm/网络。
+# 不要为它添加 node_modules 忽略规则。
